@@ -1,0 +1,14 @@
+Ohana
+Copyright 2026 Ohana contributors
+
+This product includes software developed at Salesforce, Inc.
+
+The example under examples/testdrive-ci/agents/Local_Info_Agent.agent is a vendored
+copy of the "Local_Info_Agent" Agent Script file from the Salesforce AFDX Pro-Code
+Test Drive sample project:
+
+  https://github.com/forcedotcom/afdx-pro-code-testdrive
+  Copyright (c) 2024 Salesforce, Inc.
+  Licensed under the Apache License, Version 2.0.
+
+It is included solely as a fixture to exercise Ohana's lint and simulation pipeline.

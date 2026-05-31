@@ -17,6 +17,15 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   Dependabot config.
 - Codex-in-CI: Codex PR review, issue-triage, and maintainer-triggered autofix
   workflows, project `AGENTS.md`, and a project-specific review prompt.
+- Self-contained example/tests: vendored the AFDX `Local_Info_Agent.agent` into
+  `examples/testdrive-ci/agents/` (Apache-2.0, attributed in `NOTICE`) and repointed the
+  lint/sim tests and example config at it, so `pnpm test` and `check:example` pass on a
+  fresh clone with no sibling repos.
+
+### Changed
+
+- CI workflow rewritten for the standalone repo layout (no `ohana/` working-directory or
+  path filters; added a typecheck step).
 
 ## [0.2.0]
 

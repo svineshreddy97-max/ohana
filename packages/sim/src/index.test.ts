@@ -5,16 +5,13 @@ import { runScenarioProject } from "./index.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const exampleRoot = path.resolve(__dirname, "../../../examples/testdrive-ci");
-const agentScriptEntry = path.resolve(
-  __dirname,
-  "../../../../sf-repos/agentscript/packages/agentforce/dist/index.js",
-);
+// Toolchain resolved via resolveAgentScriptEntry (sibling checkout or the repo-local
+// .agentscript cache from `pnpm ensure:agentscript`) — no hard-coded sibling path.
 
 describe("runScenarioProject", () => {
-  it("runs weather scenario against AFDX testdrive agent", async () => {
+  it("runs the weather scenario against the vendored testdrive agent", async () => {
     const result = await runScenarioProject({
       scenariosDir: path.join(exampleRoot, "scenarios"),
-      agentScriptEntry,
     });
 
     expect(result.scenarios.length).toBe(1);
