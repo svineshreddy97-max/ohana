@@ -127,6 +127,46 @@ describe("runScenarioProject duplicate ids", () => {
   });
 });
 
+describe("runScenarioProject filter", () => {
+  const tmpDirs: string[] = [];
+  afterEach(() => {
+    for (const d of tmpDirs.splice(0)) fs.rmSync(d, { recursive: true, force: true });
+  });
+
+  function project(): string {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "ohana-filter-"));
+    tmpDirs.push(root);
+    const scenariosDir = path.join(root, "scenarios");
+    fs.mkdirSync(scenariosDir);
+    for (const id of ["weather-apex", "billing-flow"]) {
+      fs.writeFileSync(
+        path.join(scenariosDir, `${id}.json`),
+        JSON.stringify({
+          id,
+          agent: "agents/x.agent",
+          utterance: "hi",
+          subagent: "sa",
+          action: { name: "act" },
+        }),
+      );
+    }
+    return scenariosDir;
+  }
+
+  it("runs only scenarios whose id matches the filter (case-insensitive)", async () => {
+    const scenariosDir = project();
+    const result = await runScenarioProject({ scenariosDir, filter: "WEATHER" });
+    expect(result.scenarios.map((s) => s.id)).toEqual(["weather-apex"]);
+  });
+
+  it("returns no scenarios when the filter matches nothing", async () => {
+    const scenariosDir = project();
+    const result = await runScenarioProject({ scenariosDir, filter: "nope" });
+    expect(result.scenarios).toHaveLength(0);
+    expect(result.ok).toBe(false);
+  });
+});
+
 describe("loadScenarioFile (YAML on disk)", () => {
   const tmpFiles: string[] = [];
   afterEach(() => {

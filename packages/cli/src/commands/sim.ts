@@ -7,6 +7,8 @@ export interface SimCommandOptions {
   // "sarif" is a lint-only format; sim renders it as text.
   format?: "text" | "json" | "sarif";
   agentScriptEntry?: string;
+  /** Case-insensitive substring; only scenarios whose id contains it run. */
+  filter?: string;
 }
 
 export async function simCommand(options: SimCommandOptions = {}): Promise<number> {
@@ -19,6 +21,7 @@ export async function simCommand(options: SimCommandOptions = {}): Promise<numbe
     scenariosDir,
     projectRoot,
     agentScriptEntry: options.agentScriptEntry,
+    filter: options.filter,
   });
 
   if (options.format === "json") {
@@ -28,8 +31,12 @@ export async function simCommand(options: SimCommandOptions = {}): Promise<numbe
   }
 
   if (result.scenarios.length === 0) {
-    console.error(`\nNo scenarios found in ${scenariosDir}`);
-    console.error("Add JSON files under scenarios/ — see examples/scenarios/");
+    if (options.filter) {
+      console.error(`\nNo scenarios matched --filter "${options.filter}" in ${scenariosDir}`);
+    } else {
+      console.error(`\nNo scenarios found in ${scenariosDir}`);
+      console.error("Add JSON files under scenarios/ — see examples/scenarios/");
+    }
     return 2;
   }
 

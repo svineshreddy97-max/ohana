@@ -13,6 +13,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `ohana --version` / `ohana -v` prints the CLI version.
 - `ohana sim` now fails with a clear error when two scenarios share an `id`,
   instead of silently double-counting them.
+- `ohana sim --filter <id>` runs only scenarios whose id contains the given
+  case-insensitive substring — handy for iterating on one scenario locally.
 - Config YAML parser now understands block sequences and flow arrays, so
   `lint.globs` (and other list options) can be set in `.ohana/config.yaml`
   rather than only via CLI flags.

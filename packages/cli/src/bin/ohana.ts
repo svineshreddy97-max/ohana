@@ -21,6 +21,7 @@ Options (lint / check):
 
 Options (sim):
   --path <dir>             Project root containing scenarios/ (default: cwd)
+  --filter <id>            Only run scenarios whose id contains this substring
 
 Examples:
   ohana lint
@@ -49,7 +50,12 @@ async function main() {
   }
 
   if (command === "sim") {
-    process.exit(await simCommand(shared));
+    process.exit(
+      await simCommand({
+        ...shared,
+        filter: typeof options.filter === "string" ? options.filter : undefined,
+      }),
+    );
   }
 
   if (command === "check") {

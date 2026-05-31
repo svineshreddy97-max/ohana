@@ -292,12 +292,16 @@ export async function runScenarioProject(options: {
   scenariosDir: string;
   projectRoot?: string;
   agentScriptEntry?: string;
+  /** Case-insensitive substring; only scenarios whose id contains it are run. */
+  filter?: string;
 }): Promise<SimProjectResult> {
   const scenariosDir = path.resolve(options.scenariosDir);
   const projectRoot = options.projectRoot ?? path.dirname(scenariosDir);
   const files = discoverScenarioFiles(scenariosDir);
 
-  const loaded = files.map((file) => loadScenarioFile(file, projectRoot));
+  const all = files.map((file) => loadScenarioFile(file, projectRoot));
+  const filter = options.filter?.toLowerCase();
+  const loaded = filter ? all.filter((s) => s.id.toLowerCase().includes(filter)) : all;
 
   // Scenario ids identify a test in reports — collisions are a config error.
   const idCounts = new Map<string, number>();
