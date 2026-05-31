@@ -2,11 +2,13 @@
 import { checkCommand } from "../commands/check.js";
 import { lintCommand } from "../commands/lint.js";
 import { simCommand } from "../commands/sim.js";
+import { initCommand } from "../commands/init.js";
 import { getVersion, parseArgs, sharedOptions } from "../args.js";
 
 const HELP = `ohana — CI tooling for Salesforce Agent Script / Agentforce DX
 
 Usage:
+  ohana init [options]     Scaffold .ohana/config.yaml + scenarios/ + fixtures/
   ohana lint [options]     Parse, lint, and compile .agent files
   ohana sim [options]      Run offline scenario simulations
   ohana check [options]    lint + sim (default CI entry)
@@ -47,6 +49,10 @@ async function main() {
   }
 
   const shared = sharedOptions(options);
+
+  if (command === "init") {
+    process.exit(await initCommand({ path: shared.path }));
+  }
 
   const out = typeof options.out === "string" ? options.out : undefined;
 
