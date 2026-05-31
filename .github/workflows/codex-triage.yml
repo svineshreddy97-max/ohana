@@ -1,0 +1,77 @@
+name: Codex issue triage
+
+# When a new issue is opened, Codex reads the repo context and posts a triage comment:
+# a one-line summary, likely affected area, whether it belongs upstream (agentscript),
+# and suggested labels. Maintainer keeps final say. Requires repo secret OPENAI_API_KEY.
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      final_message: ${{ steps.run_codex.outputs.final-message }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+
+      - name: Run Codex triage
+        id: run_codex
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          sandbox: read-only
+          prompt: |
+            A new issue was opened on ${{ github.repository }}. Read `AGENTS.md` for
+            project context, then triage the issue below. Respond in markdown with:
+              - **Summary**: one sentence.
+              - **Area**: which package/file is most likely involved
+                (core / lint / sim / cli / action / agentscript-setup).
+              - **Scope**: is this an ohana bug, a feature request, a usage/setup
+                question, or really an upstream salesforce/agentscript issue?
+              - **Suggested labels**: from bug, enhancement, question, docs,
+                agentscript-upstream, needs-repro.
+              - **Missing info**: anything needed to reproduce (version, OS/Node,
+                command, how agentscript was provisioned).
+            Be brief. Do not claim to have fixed anything.
+
+            Issue title: ${{ github.event.issue.title }}
+
+            Issue body:
+            ${{ github.event.issue.body }}
+
+  post_triage:
+    runs-on: ubuntu-latest
+    needs: triage
+    if: needs.triage.outputs.final_message != ''
+    permissions:
+      issues: write
+    steps:
+      - name: Post triage comment
+        uses: actions/github-script@v7
+        env:
+          CODEX_FINAL_MESSAGE: ${{ needs.triage.outputs.final_message }}
+        with:
+          github-token: ${{ github.token }}
+          script: |
+            const body = [
+              "### 🤖 Codex triage",
+              "",
+              process.env.CODEX_FINAL_MESSAGE,
+              "",
+              "_Automated triage — a maintainer will confirm labels and next steps._",
+            ].join("\n");
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              body,
+            });

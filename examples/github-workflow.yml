@@ -1,0 +1,21 @@
+name: Agentforce CI
+
+on:
+  pull_request:
+    paths:
+      - "**/*.agent"
+      - "**/aiAuthoringBundles/**"
+      - "scenarios/**"
+      - "fixtures/**"
+      - ".ohana/**"
+
+jobs:
+  ohana:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: ./ohana/action
+        with:
+          path: ohana/examples/testdrive-ci
+          mode: check

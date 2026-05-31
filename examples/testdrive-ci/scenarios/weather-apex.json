@@ -1,0 +1,14 @@
+{
+  "id": "weather-apex",
+  "agent": "../../../sf-repos/afdx-pro-code-testdrive/force-app/main/default/aiAuthoringBundles/Local_Info_Agent/Local_Info_Agent.agent",
+  "utterance": "What's the weather like today?",
+  "subagent": "local_weather",
+  "action": {
+    "name": "check_weather",
+    "target": "CheckWeather",
+    "inputs": {
+      "dateToCheck": "2026-05-30"
+    }
+  },
+  "fixture": "fixtures/CheckWeather.json"
+}

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Agent Script (upstream)
+    url: https://github.com/salesforce/agentscript
+    about: Questions about the Agent Script language/compiler itself belong upstream.
+  - name: Discussions
+    url: https://github.com/ohana-dev/ohana/discussions
+    about: Questions, ideas, and show-and-tell.

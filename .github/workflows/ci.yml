@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    paths:
+      - "ohana/**"
+      - "sf-repos/afdx-pro-code-testdrive/**"
+      - "sf-repos/agentscript/**"
+  pull_request:
+    paths:
+      - "ohana/**"
+
+jobs:
+  ohana:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ohana
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: ohana/pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install
+
+      - name: Build agentscript toolchain
+        run: pnpm ensure:agentscript
+
+      - name: Build ohana
+        run: pnpm build
+
+      - name: Test
+        run: pnpm test
+
+      - name: Check example project
+        run: node packages/cli/dist/bin/ohana.js check --path examples/testdrive-ci

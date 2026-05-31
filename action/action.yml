@@ -1,0 +1,78 @@
+name: Ohana CI
+description: Lint and simulate Salesforce Agent Script (.agent) files in CI — no org required
+author: ohana-dev
+
+inputs:
+  path:
+    description: Project root in the consumer repo (contains .agent files and/or scenarios/)
+    required: false
+    default: "."
+  mode:
+    description: "lint | sim | check"
+    required: false
+    default: "check"
+  fail-on-warning:
+    description: Fail lint when warnings are present
+    required: false
+    default: "false"
+  format:
+    description: "Output format: text | json"
+    required: false
+    default: "text"
+  agentscript-entry:
+    description: Path to a prebuilt @agentscript/agentforce dist/index.js (skips the source build)
+    required: false
+    default: ""
+  agentscript-ref:
+    description: Git ref/tag/sha of salesforce/agentscript to build (pin for reproducible CI)
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: "22"
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 10
+
+    - name: Build Ohana
+      shell: bash
+      env:
+        OHANA_AGENTSCRIPT_ENTRY: ${{ inputs.agentscript-entry }}
+        OHANA_AGENTSCRIPT_REF: ${{ inputs.agentscript-ref }}
+      run: |
+        set -euo pipefail
+        # When consumed as `uses: ohana-dev/ohana/action@<ref>`, the whole repo is
+        # checked out to github.action_path/.. — i.e. the ohana repo root.
+        OHANA_ROOT="${{ github.action_path }}/.."
+        if [ ! -f "$OHANA_ROOT/package.json" ]; then
+          OHANA_ROOT="${{ github.action_path }}/../.."
+        fi
+        cd "$OHANA_ROOT"
+        pnpm install --frozen-lockfile || pnpm install
+        pnpm ensure:agentscript
+        pnpm build
+        echo "OHANA_BIN=$OHANA_ROOT/packages/cli/dist/bin/ohana.js" >> "$GITHUB_ENV"
+
+    - name: Run Ohana
+      shell: bash
+      run: |
+        set -euo pipefail
+        ARGS="${{ inputs.mode }} --path ${{ inputs.path }} --format ${{ inputs.format }}"
+        if [ "${{ inputs.fail-on-warning }}" = "true" ]; then
+          ARGS="$ARGS --fail-on-warning"
+        fi
+        if [ -n "${{ inputs.agentscript-entry }}" ]; then
+          ARGS="$ARGS --agentscript ${{ inputs.agentscript-entry }}"
+        fi
+        node "$OHANA_BIN" $ARGS
+
+branding:
+  icon: check-circle
+  color: blue

@@ -1,0 +1,9 @@
+version: 1
+
+lint:
+  path: ../../../sf-repos/afdx-pro-code-testdrive
+  fail_on_warning: false
+
+sim:
+  fixtures: fixtures
+  scenarios: scenarios

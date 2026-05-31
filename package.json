@@ -1,0 +1,21 @@
+{
+  "name": "ohana",
+  "version": "0.2.0",
+  "private": true,
+  "description": "CI and tooling for Salesforce Agent Script / Agentforce DX",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "build": "pnpm -r run build",
+    "test": "pnpm -r run test",
+    "check:example": "node packages/cli/dist/bin/ohana.js check --path examples/testdrive-ci",
+    "lint:agents": "node packages/cli/dist/bin/ohana.js lint --path examples/testdrive-ci",
+    "sim:example": "node packages/cli/dist/bin/ohana.js sim --path examples/testdrive-ci",
+    "typecheck": "pnpm -r run typecheck",
+    "ensure:agentscript": "node scripts/ensure-agentscript.mjs"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@10.28.0"
+}
