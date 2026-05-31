@@ -15,6 +15,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   parent dirs) instead of stdout — e.g. `lint --format sarif --out ohana.sarif`.
 - `ohana init` scaffolds `.ohana/config.yaml`, `scenarios/`, and `fixtures/`
   for a new project. Idempotent — never overwrites existing files.
+- Colorized text reports on a TTY (pass/fail summary, ✓/✗ marks, severity
+  labels). Honors `--no-color` and the `NO_COLOR` convention, and stays plain
+  for non-TTY, `--out`, and machine formats.
 - `ohana sim` now fails with a clear error when two scenarios share an `id`,
   instead of silently double-counting them.
 - `ohana sim --filter <id>` runs only scenarios whose id contains the given

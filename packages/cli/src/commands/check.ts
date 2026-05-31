@@ -7,6 +7,7 @@ export interface CheckCommandOptions {
   failOnWarning?: boolean;
   agentScriptEntry?: string;
   skipSim?: boolean;
+  color?: boolean;
 }
 
 export async function checkCommand(options: CheckCommandOptions = {}): Promise<number> {
@@ -15,6 +16,7 @@ export async function checkCommand(options: CheckCommandOptions = {}): Promise<n
     format: options.format,
     failOnWarning: options.failOnWarning,
     agentScriptEntry: options.agentScriptEntry,
+    color: options.color,
   };
 
   const lintCode = await lintCommand(lintOpts);
@@ -31,6 +33,7 @@ export async function checkCommand(options: CheckCommandOptions = {}): Promise<n
     path: options.path,
     format: options.format,
     agentScriptEntry: options.agentScriptEntry,
+    color: options.color,
   });
 }
 

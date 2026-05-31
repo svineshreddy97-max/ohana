@@ -13,6 +13,7 @@ export interface LintCommandOptions {
   failOnWarning?: boolean;
   agentScriptEntry?: string;
   out?: string;
+  color?: boolean;
 }
 
 export async function lintCommand(options: LintCommandOptions = {}): Promise<number> {
@@ -29,7 +30,7 @@ export async function lintCommand(options: LintCommandOptions = {}): Promise<num
         ? formatLintReportGithub(result)
         : options.format === "json"
           ? JSON.stringify(sanitizeForJson(result), null, 2)
-          : formatLintReportText(result);
+          : formatLintReportText(result, { color: options.color });
   emitReport(output, options.out);
 
   if (result.fileCount === 0) {

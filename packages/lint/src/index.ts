@@ -3,6 +3,7 @@ import path from "node:path";
 import {
   compileAgentFile,
   loadConfig,
+  makeColorizer,
   resolveFromRoot,
   type AgentDiagnostic,
   type DiagnosticSeverityName,
@@ -156,24 +157,26 @@ export async function lintProject(options: LintProjectOptions = {}): Promise<Lin
   };
 }
 
-export function formatLintReportText(result: LintProjectResult): string {
+export function formatLintReportText(
+  result: LintProjectResult,
+  options: { color?: boolean } = {},
+): string {
+  const c = makeColorizer(options.color ?? false);
   const lines: string[] = [];
   lines.push(`Ohana lint — ${result.fileCount} file(s) under ${result.root}`);
-  lines.push(
-    result.ok
-      ? `OK (${result.errorCount} errors, ${result.warningCount} warnings)`
-      : `FAILED (${result.errorCount} errors, ${result.warningCount} warnings)`,
-  );
+  const summary = `(${result.errorCount} errors, ${result.warningCount} warnings)`;
+  lines.push(result.ok ? c.green(`OK ${summary}`) : c.red(`FAILED ${summary}`));
 
   for (const file of result.files) {
     if (file.diagnostics.length === 0) {
-      lines.push(`  ✓ ${file.file}`);
+      lines.push(`  ${c.green("✓")} ${file.file}`);
       continue;
     }
-    lines.push(`  ✗ ${file.file}`);
+    lines.push(`  ${c.red("✗")} ${file.file}`);
     for (const d of file.diagnostics) {
+      const sev = d.severity === "error" ? c.red(d.severity) : d.severity === "warning" ? c.yellow(d.severity) : c.dim(d.severity);
       lines.push(
-        `    ${d.severity} ${d.line}:${d.column} ${d.code ? `[${d.code}] ` : ""}${d.message}`,
+        `    ${sev} ${d.line}:${d.column} ${d.code ? `[${d.code}] ` : ""}${d.message}`,
       );
     }
   }

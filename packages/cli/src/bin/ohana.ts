@@ -4,6 +4,7 @@ import { lintCommand } from "../commands/lint.js";
 import { simCommand } from "../commands/sim.js";
 import { initCommand } from "../commands/init.js";
 import { getVersion, parseArgs, sharedOptions } from "../args.js";
+import { shouldColorize } from "@ohana/core";
 
 const HELP = `ohana — CI tooling for Salesforce Agent Script / Agentforce DX
 
@@ -21,6 +22,7 @@ Options (lint / check):
                            github: inline PR annotations via workflow commands (lint).
   --fail-on-warning        Exit non-zero on warnings
   --out <file>             Write the report to a file instead of stdout (lint/sim)
+  --no-color               Disable ANSI color (also honors NO_COLOR)
   --agentscript <path>     Path to @agentscript/agentforce dist/index.js
   --skip-sim               For check: run lint only
 
@@ -55,9 +57,18 @@ async function main() {
   }
 
   const out = typeof options.out === "string" ? options.out : undefined;
+  // Color only makes sense for text written to a TTY (not files or machine formats).
+  const color =
+    shared.format === "text" &&
+    !out &&
+    shouldColorize({
+      isTty: process.stdout.isTTY,
+      noColorEnv: process.env.NO_COLOR,
+      explicitNoColor: options["no-color"] === true,
+    });
 
   if (command === "lint") {
-    process.exit(await lintCommand({ ...shared, out }));
+    process.exit(await lintCommand({ ...shared, out, color }));
   }
 
   if (command === "sim") {
@@ -65,6 +76,7 @@ async function main() {
       await simCommand({
         ...shared,
         out,
+        color,
         filter: typeof options.filter === "string" ? options.filter : undefined,
       }),
     );
@@ -74,6 +86,7 @@ async function main() {
     process.exit(
       await checkCommand({
         ...shared,
+        color,
         skipSim: options["skip-sim"] === true,
       }),
     );

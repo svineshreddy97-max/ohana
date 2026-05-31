@@ -4,6 +4,7 @@ import {
   compileAgentFile,
   findAction,
   findNode,
+  makeColorizer,
   parseSimpleYaml,
 } from "@ohana/core";
 
@@ -329,13 +330,17 @@ export async function runScenarioProject(options: {
   };
 }
 
-export function formatSimReportText(result: SimProjectResult): string {
+export function formatSimReportText(
+  result: SimProjectResult,
+  options: { color?: boolean } = {},
+): string {
+  const c = makeColorizer(options.color ?? false);
   const lines: string[] = [];
   lines.push(`Ohana sim — ${result.scenarios.length} scenario(s) under ${result.root}`);
-  lines.push(result.ok ? "OK" : "FAILED");
+  lines.push(result.ok ? c.green("OK") : c.red("FAILED"));
 
   for (const scenario of result.scenarios) {
-    lines.push(`  ${scenario.ok ? "✓" : "✗"} ${scenario.id}`);
+    lines.push(`  ${scenario.ok ? c.green("✓") : c.red("✗")} ${scenario.id}`);
     lines.push(`    utterance: ${scenario.utterance}`);
     lines.push(
       `    route: ${scenario.subagent} → ${scenario.action}${scenario.target ? ` (${scenario.target})` : ""}`,
@@ -344,7 +349,7 @@ export function formatSimReportText(result: SimProjectResult): string {
       lines.push(`    outputs: ${JSON.stringify(scenario.outputs)}`);
     }
     for (const err of scenario.errors) {
-      lines.push(`    error: ${err}`);
+      lines.push(`    ${c.red("error")}: ${err}`);
     }
   }
 

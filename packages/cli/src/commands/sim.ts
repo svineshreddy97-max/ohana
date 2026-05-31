@@ -11,6 +11,7 @@ export interface SimCommandOptions {
   /** Case-insensitive substring; only scenarios whose id contains it run. */
   filter?: string;
   out?: string;
+  color?: boolean;
 }
 
 export async function simCommand(options: SimCommandOptions = {}): Promise<number> {
@@ -29,7 +30,7 @@ export async function simCommand(options: SimCommandOptions = {}): Promise<numbe
   const output =
     options.format === "json"
       ? JSON.stringify(result, null, 2)
-      : formatSimReportText(result);
+      : formatSimReportText(result, { color: options.color });
   emitReport(output, options.out);
 
   if (result.scenarios.length === 0) {

@@ -22,3 +22,10 @@ export {
   resolveFromRoot,
   type OhanaConfig,
 } from "./config.js";
+
+export {
+  makeColorizer,
+  shouldColorize,
+  type ColorName,
+  type Colorizer,
+} from "./color.js";
