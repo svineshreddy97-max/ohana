@@ -15,9 +15,9 @@ Fill the bracketed fields before submitting.
 
 ---
 
-**Applicant / maintainer:** Vinesh Shampoor — `[GitHub handle]`
+**Applicant / maintainer:** Vinesh Shampoor — GitHub `svineshreddy97-max`
 **Email:** vinesh.shampoor@blue5green.com
-**Role on the project:** Creator and core maintainer (write access / repo owner)
+**Role on the project:** Creator and sole core maintainer (repo owner, full write access)
 **Project:** Ohana — CI tooling for Salesforce Agent Script / Agentforce DX
 **Repository:** `https://github.com/svineshreddy97-max/ohana` (public, Apache-2.0)
 **License:** Apache-2.0
@@ -40,11 +40,13 @@ another app.
 
 ## How is it maintained, and how active is it?
 
-- Public repo with CI (build + test + example check on every PR), Dependabot, issue and
-  PR templates, a Code of Conduct, and a security policy with private vulnerability
-  reporting.
-- `[N]` releases following SemVer with a maintained `CHANGELOG.md`; current `v0.2.0`.
-- Active issue triage and PR review `[link to issues/PRs]`.
+- Public repo with green CI (build + typecheck + test + example check on every PR),
+  Dependabot, issue and PR templates, a Code of Conduct, and a security policy with
+  private vulnerability reporting.
+- Versioned with SemVer and a maintained `CHANGELOG.md`; current release `v0.2.0`
+  (first public release).
+- Issue triage and PR review run by the maintainer:
+  `https://github.com/svineshreddy97-max/ohana/issues` and `/pulls`.
 - Roadmap published in the README (npm publish, SARIF security rules, trace export).
 
 ## How do you use — or plan to use — Codex in the project?
