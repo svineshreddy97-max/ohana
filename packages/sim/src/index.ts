@@ -4,6 +4,7 @@ import {
   compileAgentFile,
   findAction,
   findNode,
+  parseSimpleYaml,
 } from "@ohana/core";
 
 export interface ActionFixtureFile {
@@ -73,9 +74,17 @@ export interface SimScenario {
   };
 }
 
+/** Parse a scenario file by extension: JSON for .json, the config YAML subset for .yaml/.yml. */
+export function parseScenarioText(text: string, scenarioPath: string): SimScenario {
+  if (/\.ya?ml$/i.test(scenarioPath)) {
+    return parseSimpleYaml(text) as unknown as SimScenario;
+  }
+  return JSON.parse(text) as SimScenario;
+}
+
 export function loadScenarioFile(scenarioPath: string, projectRoot?: string): SimScenario {
   const text = fs.readFileSync(scenarioPath, "utf8");
-  const parsed = JSON.parse(text) as SimScenario;
+  const parsed = parseScenarioText(text, scenarioPath);
   const root = projectRoot ?? path.dirname(path.dirname(scenarioPath));
 
   if (!parsed.id || !parsed.agent || !parsed.utterance || !parsed.subagent || !parsed.action?.name) {

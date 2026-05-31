@@ -31,6 +31,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   lint/sim tests and example config at it, so `pnpm test` and `check:example` pass on a
   fresh clone with no sibling repos.
 
+### Fixed
+
+- `ohana sim` no longer crashes on `.yaml`/`.yml` scenario files. Scenario
+  discovery already matched them, but the loader only ran `JSON.parse`; YAML
+  scenarios are now parsed with the config YAML subset.
+
 ### Changed
 
 - CI workflow rewritten for the standalone repo layout (no `ohana/` working-directory or
