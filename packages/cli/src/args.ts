@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-export type OutputFormat = "text" | "json" | "sarif";
+export type OutputFormat = "text" | "json" | "sarif" | "github";
 
 export interface ParsedArgs {
   command: string;
@@ -66,7 +66,9 @@ export function sharedOptions(options: Record<string, string | boolean>): Shared
         ? "json"
         : options.format === "sarif"
           ? "sarif"
-          : "text",
+          : options.format === "github"
+            ? "github"
+            : "text",
     failOnWarning: options["fail-on-warning"] === true,
     agentScriptEntry:
       typeof options.agentscript === "string" ? options.agentscript : undefined,

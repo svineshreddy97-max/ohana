@@ -4,8 +4,8 @@ import { formatSimReportText, runScenarioProject } from "@ohana/sim";
 
 export interface SimCommandOptions {
   path?: string;
-  // "sarif" is a lint-only format; sim renders it as text.
-  format?: "text" | "json" | "sarif";
+  // "sarif" and "github" are lint-only formats; sim renders them as text.
+  format?: "text" | "json" | "sarif" | "github";
   agentScriptEntry?: string;
   /** Case-insensitive substring; only scenarios whose id contains it run. */
   filter?: string;

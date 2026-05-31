@@ -21,6 +21,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - `ohana lint --format sarif` — emits a SARIF 2.1.0 log for GitHub code scanning, so
   diagnostics surface as inline PR annotations.
+- `ohana lint --format github` — emits GitHub Actions workflow-command
+  annotations (`::error file=…,line=…::msg`), surfacing diagnostics inline on
+  the PR with no SARIF upload step. Message/property escaping per the spec.
 - Standalone build support: `pnpm ensure:agentscript` now clones and builds
   `salesforce/agentscript` into a repo-local `.agentscript/` cache when no
   sibling checkout or prebuilt entry is available. Pin with `OHANA_AGENTSCRIPT_REF`.

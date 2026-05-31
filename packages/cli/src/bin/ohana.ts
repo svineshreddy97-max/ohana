@@ -14,7 +14,9 @@ Usage:
 
 Options (lint / check):
   --path <dir>             Project root (default: cwd or .ohana/config.yaml)
-  --format <text|json|sarif>  Output format (default: text). sarif: GitHub code scanning (lint)
+  --format <text|json|sarif|github>  Output format (default: text).
+                           sarif: GitHub code scanning upload (lint).
+                           github: inline PR annotations via workflow commands (lint).
   --fail-on-warning        Exit non-zero on warnings
   --agentscript <path>     Path to @agentscript/agentforce dist/index.js
   --skip-sim               For check: run lint only

@@ -178,4 +178,5 @@ export function formatLintReportText(result: LintProjectResult): string {
 }
 
 export { formatLintReportSarif, buildSarif } from "./sarif.js";
+export { formatLintReportGithub } from "./github.js";
 export { resolveFromRoot, loadConfig, type DiagnosticSeverityName };

@@ -1,4 +1,5 @@
 import {
+  formatLintReportGithub,
   formatLintReportSarif,
   formatLintReportText,
   lintProject,
@@ -7,7 +8,7 @@ import {
 
 export interface LintCommandOptions {
   path?: string;
-  format?: "text" | "json" | "sarif";
+  format?: "text" | "json" | "sarif" | "github";
   failOnWarning?: boolean;
   agentScriptEntry?: string;
 }
@@ -21,6 +22,8 @@ export async function lintCommand(options: LintCommandOptions = {}): Promise<num
 
   if (options.format === "sarif") {
     console.log(formatLintReportSarif(result));
+  } else if (options.format === "github") {
+    console.log(formatLintReportGithub(result));
   } else if (options.format === "json") {
     console.log(JSON.stringify(sanitizeForJson(result), null, 2));
   } else {
