@@ -1,0 +1,49 @@
+name: Bug report
+description: Something in ohana lint / sim / check behaves incorrectly
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for filing a bug. Please include enough detail to reproduce it.
+  - type: input
+    id: version
+    attributes:
+      label: Ohana version
+      placeholder: "0.2.0 (or commit SHA)"
+    validations:
+      required: true
+  - type: dropdown
+    id: command
+    attributes:
+      label: Command
+      options:
+        - ohana lint
+        - ohana sim
+        - ohana check
+        - other / build / setup
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you run, what did you expect, and what did you get?
+      placeholder: |
+        $ ohana check --path force-app
+        ...output...
+    validations:
+      required: true
+  - type: textarea
+    id: agentscript
+    attributes:
+      label: Agent Script toolchain
+      description: How is @agentscript/agentforce provisioned? (ensure:agentscript, OHANA_AGENTSCRIPT_ENTRY, npm, etc.)
+    validations:
+      required: false
+  - type: input
+    id: env
+    attributes:
+      label: OS / Node version
+      placeholder: "Windows 11 / Node 22.3.0"
+    validations:
+      required: true

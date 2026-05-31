@@ -1,0 +1,26 @@
+{
+  "action": "CheckWeather",
+  "target": "apex://CheckWeather",
+  "mocks": [
+    {
+      "match": {
+        "dateToCheck": "2026-05-30"
+      },
+      "outputs": {
+        "maxTemperature": 21.0,
+        "minTemperature": 10.5,
+        "temperatureDescription": "Sunny with mild temperatures at Coral Cloud Resort"
+      }
+    },
+    {
+      "match": {
+        "default": true
+      },
+      "outputs": {
+        "maxTemperature": 20.0,
+        "minTemperature": 12.0,
+        "temperatureDescription": "Partly cloudy"
+      }
+    }
+  ]
+}

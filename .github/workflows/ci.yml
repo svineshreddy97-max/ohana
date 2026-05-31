@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  ohana:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install
+        run: pnpm install
+
+      - name: Build agentscript toolchain
+        # Clones + builds salesforce/agentscript into .agentscript/ (see scripts/ensure-agentscript.mjs).
+        # Pin OHANA_AGENTSCRIPT_REF to a tag/sha for reproducible, faster builds.
+        run: pnpm ensure:agentscript
+
+      - name: Build
+        run: pnpm build
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Check example project
+        run: node packages/cli/dist/bin/ohana.js check --path examples/testdrive-ci

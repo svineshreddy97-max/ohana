@@ -1,0 +1,11 @@
+# Normalize line endings to LF in the repository (cross-platform consistency).
+* text=auto eol=lf
+
+# Lockfiles and JSON are text.
+*.json text
+*.yaml text
+*.yml text
+
+# Keep shell scripts LF regardless of platform.
+*.sh text eol=lf
+*.mjs text eol=lf

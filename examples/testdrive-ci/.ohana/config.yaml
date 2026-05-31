@@ -1,0 +1,9 @@
+version: 1
+
+lint:
+  path: .
+  fail_on_warning: false
+
+sim:
+  fixtures: fixtures
+  scenarios: scenarios
