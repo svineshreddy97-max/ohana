@@ -10,6 +10,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - CLI argument parsing extracted into `@ohana/cli/args` with unit-test coverage
   (`parseArgs`, `sharedOptions`, `getVersion`).
+- `ohana --version` / `ohana -v` prints the CLI version.
 
 - `ohana lint --format sarif` — emits a SARIF 2.1.0 log for GitHub code scanning, so
   diagnostics surface as inline PR annotations.

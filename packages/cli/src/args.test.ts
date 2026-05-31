@@ -16,6 +16,12 @@ describe("parseArgs", () => {
     expect(parseArgs(["lint", "--help"]).command).toBe("help");
   });
 
+  it("treats -v/--version/version as the version command", () => {
+    expect(parseArgs(["-v"]).command).toBe("version");
+    expect(parseArgs(["--version"]).command).toBe("version");
+    expect(parseArgs(["version"]).command).toBe("version");
+  });
+
   it("captures --flag value pairs", () => {
     const { command, options } = parseArgs(["lint", "--path", "force-app"]);
     expect(command).toBe("lint");

@@ -2,7 +2,7 @@
 import { checkCommand } from "../commands/check.js";
 import { lintCommand } from "../commands/lint.js";
 import { simCommand } from "../commands/sim.js";
-import { parseArgs, sharedOptions } from "../args.js";
+import { getVersion, parseArgs, sharedOptions } from "../args.js";
 
 const HELP = `ohana — CI tooling for Salesforce Agent Script / Agentforce DX
 
@@ -10,6 +10,7 @@ Usage:
   ohana lint [options]     Parse, lint, and compile .agent files
   ohana sim [options]      Run offline scenario simulations
   ohana check [options]    lint + sim (default CI entry)
+  ohana --version          Print the ohana version
 
 Options (lint / check):
   --path <dir>             Project root (default: cwd or .ohana/config.yaml)
@@ -33,6 +34,11 @@ async function main() {
 
   if (command === "help") {
     console.log(HELP);
+    process.exit(0);
+  }
+
+  if (command === "version") {
+    console.log(getVersion());
     process.exit(0);
   }
 

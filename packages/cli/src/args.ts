@@ -22,6 +22,10 @@ export function parseArgs(argv: string[]): ParsedArgs {
     return { command: "help", options: {} };
   }
 
+  if (command === "-v" || command === "--version" || command === "version") {
+    return { command: "version", options: {} };
+  }
+
   const options: Record<string, string | boolean> = {};
 
   while (args.length > 0) {
