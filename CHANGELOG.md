@@ -8,6 +8,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- CLI argument parsing extracted into `@ohana/cli/args` with unit-test coverage
+  (`parseArgs`, `sharedOptions`, `getVersion`).
+
 - `ohana lint --format sarif` — emits a SARIF 2.1.0 log for GitHub code scanning, so
   diagnostics surface as inline PR annotations.
 - Standalone build support: `pnpm ensure:agentscript` now clones and builds

@@ -2,6 +2,7 @@
 import { checkCommand } from "../commands/check.js";
 import { lintCommand } from "../commands/lint.js";
 import { simCommand } from "../commands/sim.js";
+import { parseArgs, sharedOptions } from "../args.js";
 
 const HELP = `ohana — CI tooling for Salesforce Agent Script / Agentforce DX
 
@@ -26,53 +27,6 @@ Examples:
   ohana check --path examples/testdrive-ci
   ohana lint --format json --fail-on-warning
 `;
-
-function parseArgs(argv: string[]) {
-  const args = [...argv];
-  const command = args.shift();
-
-  if (!command || command === "-h" || command === "--help" || command === "help") {
-    return { command: "help" as const, options: {} as Record<string, string | boolean> };
-  }
-
-  const options: Record<string, string | boolean> = {};
-
-  while (args.length > 0) {
-    const token = args.shift();
-    if (!token) break;
-
-    if (token === "-h" || token === "--help") {
-      return { command: "help" as const, options: {} };
-    }
-
-    if (token.startsWith("--")) {
-      const key = token.slice(2);
-      const next = args[0];
-      if (next && !next.startsWith("-")) {
-        options[key] = args.shift()!;
-      } else {
-        options[key] = true;
-      }
-    }
-  }
-
-  return { command, options };
-}
-
-function sharedOptions(options: Record<string, string | boolean>) {
-  return {
-    path: typeof options.path === "string" ? options.path : undefined,
-    format:
-      options.format === "json"
-        ? ("json" as const)
-        : options.format === "sarif"
-          ? ("sarif" as const)
-          : ("text" as const),
-    failOnWarning: options["fail-on-warning"] === true,
-    agentScriptEntry:
-      typeof options.agentscript === "string" ? options.agentscript : undefined,
-  };
-}
 
 async function main() {
   const { command, options } = parseArgs(process.argv.slice(2));
