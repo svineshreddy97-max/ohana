@@ -3,7 +3,13 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, describe, expect, it } from "vitest";
-import { parseScenarioText, runScenarioProject } from "./index.js";
+import {
+  deepEqual,
+  parseScenarioText,
+  resolveFixtureOutputs,
+  runScenarioProject,
+  type ActionFixtureFile,
+} from "./index.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const exampleRoot = path.resolve(__dirname, "../../../examples/testdrive-ci");
@@ -20,6 +26,42 @@ describe("runScenarioProject", () => {
     expect(result.ok).toBe(true);
     expect(result.scenarios[0]?.action).toBe("check_weather");
     expect(result.scenarios[0]?.outputs?.maxTemperature).toBe(21);
+  });
+});
+
+describe("deepEqual", () => {
+  it("compares scalars", () => {
+    expect(deepEqual(1, 1)).toBe(true);
+    expect(deepEqual("a", "a")).toBe(true);
+    expect(deepEqual(1, 2)).toBe(false);
+    expect(deepEqual(null, null)).toBe(true);
+    expect(deepEqual(null, undefined)).toBe(false);
+  });
+
+  it("compares arrays structurally", () => {
+    expect(deepEqual([1, 2, 3], [1, 2, 3])).toBe(true);
+    expect(deepEqual([1, 2], [1, 2, 3])).toBe(false);
+    expect(deepEqual([{ a: 1 }], [{ a: 1 }])).toBe(true);
+  });
+
+  it("compares plain objects structurally regardless of key order", () => {
+    expect(deepEqual({ a: 1, b: 2 }, { b: 2, a: 1 })).toBe(true);
+    expect(deepEqual({ a: 1 }, { a: 1, b: 2 })).toBe(false);
+    expect(deepEqual({ a: { b: [1] } }, { a: { b: [1] } })).toBe(true);
+  });
+});
+
+describe("resolveFixtureOutputs", () => {
+  it("matches a mock by a structured (object/array) input", () => {
+    const fixture: ActionFixtureFile = {
+      mocks: [
+        { match: { filters: ["open", "p1"] }, outputs: { count: 2 } },
+        { match: { default: true }, outputs: { count: 0 } },
+      ],
+    };
+    expect(resolveFixtureOutputs(fixture, { filters: ["open", "p1"] })).toEqual({ count: 2 });
+    // A different structured value falls through to the default mock.
+    expect(resolveFixtureOutputs(fixture, { filters: ["closed"] })).toEqual({ count: 0 });
   });
 });
 

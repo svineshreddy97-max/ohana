@@ -51,11 +51,34 @@ export function resolveFixtureOutputs(
 function matchesInputs(match: Record<string, unknown>, inputs: Record<string, unknown>): boolean {
   for (const [key, expected] of Object.entries(match)) {
     if (key === "default") continue;
-    if (inputs[key] !== expected) {
+    if (!deepEqual(inputs[key], expected)) {
       return false;
     }
   }
   return true;
+}
+
+/** Structural equality for JSON-shaped values (scalars, arrays, plain objects). */
+export function deepEqual(a: unknown, b: unknown): boolean {
+  if (a === b) return true;
+  if (typeof a !== typeof b) return false;
+  if (a === null || b === null) return a === b;
+
+  if (Array.isArray(a) || Array.isArray(b)) {
+    if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false;
+    return a.every((item, i) => deepEqual(item, b[i]));
+  }
+
+  if (typeof a === "object" && typeof b === "object") {
+    const ao = a as Record<string, unknown>;
+    const bo = b as Record<string, unknown>;
+    const aKeys = Object.keys(ao);
+    const bKeys = Object.keys(bo);
+    if (aKeys.length !== bKeys.length) return false;
+    return aKeys.every((k) => Object.prototype.hasOwnProperty.call(bo, k) && deepEqual(ao[k], bo[k]));
+  }
+
+  return false;
 }
 
 export interface SimScenario {
@@ -209,7 +232,7 @@ export async function runScenario(
 
   if (scenario.expect?.outputs && outputs) {
     for (const [key, expected] of Object.entries(scenario.expect.outputs)) {
-      if (outputs[key] !== expected) {
+      if (!deepEqual(outputs[key], expected)) {
         errors.push(
           `Expected output ${key}=${JSON.stringify(expected)}, got ${JSON.stringify(outputs[key])}`,
         );

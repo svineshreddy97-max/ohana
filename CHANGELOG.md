@@ -36,6 +36,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `ohana sim` no longer crashes on `.yaml`/`.yml` scenario files. Scenario
   discovery already matched them, but the loader only ran `JSON.parse`; YAML
   scenarios are now parsed with the config YAML subset.
+- Fixture input matching and `expect.outputs` assertions now compare values
+  structurally (deep equality), so object- and array-valued action inputs and
+  outputs match instead of always failing strict `===`.
 
 ### Changed
 
