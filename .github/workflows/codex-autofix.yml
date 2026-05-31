@@ -34,7 +34,7 @@ jobs:
       - uses: actions/checkout@v5
         # persist-credentials (default true) so we can push the fix branch.
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
