@@ -1,6 +1,6 @@
 name: Ohana CI
 description: Lint and simulate Salesforce Agent Script (.agent) files in CI — no org required
-author: ohana-dev
+author: svineshreddy97-max
 
 inputs:
   path:
@@ -48,7 +48,7 @@ runs:
         OHANA_AGENTSCRIPT_REF: ${{ inputs.agentscript-ref }}
       run: |
         set -euo pipefail
-        # When consumed as `uses: ohana-dev/ohana/action@<ref>`, the whole repo is
+        # When consumed as `uses: svineshreddy97-max/ohana/action@<ref>`, the whole repo is
         # checked out to github.action_path/.. — i.e. the ohana repo root.
         OHANA_ROOT="${{ github.action_path }}/.."
         if [ ! -f "$OHANA_ROOT/package.json" ]; then

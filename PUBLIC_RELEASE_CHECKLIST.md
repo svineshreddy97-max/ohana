@@ -4,8 +4,10 @@ Goal: get `ohana` onto public GitHub as a credible, actively-maintained OSS proj
 and list the Action on the GitHub Marketplace. The "active maintenance" clock that the
 **Codex for Open Source** program reviews only starts once this is public — so do this early.
 
-> Replace `ohana-dev` below with the real org/user once chosen. The repo URLs in the
-> README badges, `dependabot.yml`, and issue-template `config.yml` use `ohana-dev/ohana`.
+> Repo references point at `svineshreddy97-max/ohana` (your personal account — no org was
+> available; `ohana-dev` is taken and `gh` can't create orgs). To move it under an org
+> later: register an available org name, then `gh repo transfer` / Settings → Transfer
+> ownership, and re-run the `ohana-dev`→new-owner rename.
 
 ## 1. Extract `ohana/` into its own repository
 
@@ -19,7 +21,7 @@ cd C:\Users\VineshShampoor\opsrc\ohana
 git init -b main
 git add .
 git commit -m "Initial public release: ohana v0.2.0"
-gh repo create ohana-dev/ohana --public --source=. --remote=origin --push
+gh repo create svineshreddy97-max/ohana --public --source=. --remote=origin --push
 ```
 
 Verify the standalone build works with **no sibling `sf-repos/agentscript`** (this is
@@ -73,12 +75,12 @@ ours lives at `action/action.yml` so it can coexist with the monorepo. Two suppo
 paths:
 
 - **Recommended (after `@ohana/cli` is on npm, v0.3):** publish a thin companion repo
-  `ohana-dev/ohana-action` whose root `action.yml` simply runs
+  `svineshreddy97-max/ohana-action` whose root `action.yml` simply runs
   `npx @ohana/cli@<version> check`. Fast for consumers (no source build) and
   Marketplace-valid.
 - **Now (pre-npm):** at release time, copy `action/action.yml` to the repo root on a
   release branch/tag and publish from there. Consumers reference
-  `uses: ohana-dev/ohana@v0.2.0`. Slower (builds from source) but self-contained.
+  `uses: svineshreddy97-max/ohana@v0.2.0`. Slower (builds from source) but self-contained.
 
 Then: repo home → "Publish this Action to the GitHub Marketplace" → pick categories
 (*Continuous integration*, *Code quality*), accept the agreement, release.
@@ -86,7 +88,7 @@ Then: repo home → "Publish this Action to the GitHub Marketplace" → pick cat
 Consumer usage (already provided in [examples/github-workflow.yml](examples/github-workflow.yml)):
 
 ```yaml
-- uses: ohana-dev/ohana@v0.2.0   # or ./ohana/action within this repo
+- uses: svineshreddy97-max/ohana@v0.2.0   # or ./ohana/action within this repo
   with:
     path: force-app
     mode: check

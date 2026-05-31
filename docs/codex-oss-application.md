@@ -19,7 +19,7 @@ Fill the bracketed fields before submitting.
 **Email:** vinesh.shampoor@blue5green.com
 **Role on the project:** Creator and core maintainer (write access / repo owner)
 **Project:** Ohana — CI tooling for Salesforce Agent Script / Agentforce DX
-**Repository:** `https://github.com/ohana-dev/ohana` (public, Apache-2.0)
+**Repository:** `https://github.com/svineshreddy97-max/ohana` (public, Apache-2.0)
 **License:** Apache-2.0
 
 ---
@@ -84,7 +84,7 @@ makes a small-maintainer OSS infra project sustainable.
 
 ## Links to include
 
-- Repo: `https://github.com/ohana-dev/ohana`
+- Repo: `https://github.com/svineshreddy97-max/ohana`
 - README quick start, Action usage, roadmap
 - `docs/codex-integration.md` (Codex usage)
 - Background research: the Salesforce Agent Script ecosystem analysis this project came from
