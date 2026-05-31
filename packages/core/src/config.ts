@@ -7,6 +7,8 @@ export interface OhanaConfig {
     path?: string;
     globs?: string[];
     fail_on_warning?: boolean;
+    /** Extra directory names to skip during discovery, on top of the defaults. */
+    ignore?: string[];
   };
   sim?: {
     fixtures?: string;

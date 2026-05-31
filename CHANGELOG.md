@@ -20,6 +20,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Config YAML parser now understands block sequences and flow arrays, so
   `lint.globs` (and other list options) can be set in `.ohana/config.yaml`
   rather than only via CLI flags.
+- `lint.ignore` in `.ohana/config.yaml` — extra directory names to skip during
+  `.agent` discovery, on top of the built-in defaults (`node_modules`, `.git`,
+  `dist`, `.ohana`).
 
 - `ohana lint --format sarif` — emits a SARIF 2.1.0 log for GitHub code scanning, so
   diagnostics surface as inline PR annotations.

@@ -72,11 +72,14 @@ async function walkFiles(dir: string, ignore: Set<string>): Promise<string[]> {
   return files;
 }
 
+export const DEFAULT_IGNORE_DIRS = ["node_modules", ".git", "dist", ".ohana"];
+
 export async function discoverAgentFiles(
   root: string,
   globs: string[] = DEFAULT_AGENT_GLOBS,
+  extraIgnore: string[] = [],
 ): Promise<string[]> {
-  const ignore = new Set(["node_modules", ".git", "dist", ".ohana"]);
+  const ignore = new Set([...DEFAULT_IGNORE_DIRS, ...extraIgnore]);
   const allFiles = await walkFiles(root, ignore);
   const patterns = globs.map((g) => globToRegExp(g));
 
@@ -127,8 +130,9 @@ export async function lintProject(options: LintProjectOptions = {}): Promise<Lin
   const globsRaw = options.globs ?? config.lint?.globs ?? DEFAULT_AGENT_GLOBS;
   const globs = Array.isArray(globsRaw) ? globsRaw : DEFAULT_AGENT_GLOBS;
   const failOnWarning = options.failOnWarning ?? config.lint?.fail_on_warning ?? false;
+  const extraIgnore = Array.isArray(config.lint?.ignore) ? config.lint!.ignore : [];
 
-  const files = await discoverAgentFiles(root, globs);
+  const files = await discoverAgentFiles(root, globs, extraIgnore);
   const results: LintFileResult[] = [];
 
   for (const file of files) {
