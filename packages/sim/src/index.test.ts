@@ -97,6 +97,36 @@ fixture: fixtures/CheckWeather.json
   });
 });
 
+describe("runScenarioProject duplicate ids", () => {
+  const tmpDirs: string[] = [];
+  afterEach(() => {
+    for (const d of tmpDirs.splice(0)) fs.rmSync(d, { recursive: true, force: true });
+  });
+
+  it("flags scenarios that share an id", async () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "ohana-dup-"));
+    tmpDirs.push(root);
+    const scenariosDir = path.join(root, "scenarios");
+    fs.mkdirSync(scenariosDir);
+    const body = (n: string) =>
+      JSON.stringify({
+        id: "dup",
+        agent: `agents/${n}.agent`,
+        utterance: "hi",
+        subagent: "sa",
+        action: { name: "act" },
+      });
+    fs.writeFileSync(path.join(scenariosDir, "a.json"), body("a"));
+    fs.writeFileSync(path.join(scenariosDir, "b.json"), body("b"));
+
+    const result = await runScenarioProject({ scenariosDir, projectRoot: root });
+    expect(result.ok).toBe(false);
+    expect(result.scenarios.every((s) => s.errors.some((e) => e.includes("Duplicate scenario id")))).toBe(
+      true,
+    );
+  });
+});
+
 describe("loadScenarioFile (YAML on disk)", () => {
   const tmpFiles: string[] = [];
   afterEach(() => {

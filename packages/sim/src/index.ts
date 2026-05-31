@@ -296,11 +296,26 @@ export async function runScenarioProject(options: {
   const scenariosDir = path.resolve(options.scenariosDir);
   const projectRoot = options.projectRoot ?? path.dirname(scenariosDir);
   const files = discoverScenarioFiles(scenariosDir);
-  const scenarios: SimScenarioResult[] = [];
 
-  for (const file of files) {
-    const scenario = loadScenarioFile(file, projectRoot);
-    scenarios.push(await runScenario(scenario, { agentScriptEntry: options.agentScriptEntry }));
+  const loaded = files.map((file) => loadScenarioFile(file, projectRoot));
+
+  // Scenario ids identify a test in reports — collisions are a config error.
+  const idCounts = new Map<string, number>();
+  for (const s of loaded) {
+    idCounts.set(s.id, (idCounts.get(s.id) ?? 0) + 1);
+  }
+  const duplicateIds = new Set(
+    [...idCounts.entries()].filter(([, count]) => count > 1).map(([id]) => id),
+  );
+
+  const scenarios: SimScenarioResult[] = [];
+  for (const scenario of loaded) {
+    const result = await runScenario(scenario, { agentScriptEntry: options.agentScriptEntry });
+    if (duplicateIds.has(scenario.id)) {
+      result.ok = false;
+      result.errors.push(`Duplicate scenario id: ${scenario.id}`);
+    }
+    scenarios.push(result);
   }
 
   return {
