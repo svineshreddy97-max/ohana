@@ -46,23 +46,48 @@ export function findConfigFile(startDir: string): string | undefined {
   }
 }
 
-/** Minimal YAML subset parser for Ohana config (no dependency). */
+/**
+ * Minimal YAML subset parser for Ohana config (no dependency). Supports nested
+ * maps, scalars, flow arrays (`globs: ["a", "b"]`), and block sequences:
+ *
+ *   globs:
+ *     - "**\/*.agent"
+ *     - force-app/**\/*.agent
+ */
 export function parseSimpleYaml(text: string): Record<string, unknown> {
   const root: Record<string, unknown> = {};
   const stack: Array<{ indent: number; obj: Record<string, unknown> }> = [
     { indent: -1, obj: root },
   ];
+  // The most recent `key:` with an empty value, so block-sequence items ("- x")
+  // that follow on deeper-indented lines can attach to it as an array.
+  let pending: { indent: number; key: string; obj: Record<string, unknown> } | null = null;
 
   for (const rawLine of text.split(/\r?\n/)) {
     const line = rawLine.replace(/\s+#.*$/, "");
     if (!line.trim()) continue;
 
     const indent = line.match(/^ */)![0].length;
+    const trimmed = line.trim();
+
+    const seq = trimmed.match(/^-\s+(.*)$/);
+    if (seq) {
+      if (pending && indent > pending.indent) {
+        let arr = pending.obj[pending.key];
+        if (!Array.isArray(arr)) {
+          arr = [];
+          pending.obj[pending.key] = arr;
+        }
+        (arr as unknown[]).push(parseScalar(seq[1].trim()));
+      }
+      continue;
+    }
+
     while (stack.length > 1 && indent <= stack[stack.length - 1].indent) {
       stack.pop();
     }
 
-    const match = line.trim().match(/^([^:]+):\s*(.*)$/);
+    const match = trimmed.match(/^([^:]+):\s*(.*)$/);
     if (!match) continue;
 
     const key = match[1].trim();
@@ -70,13 +95,16 @@ export function parseSimpleYaml(text: string): Record<string, unknown> {
     const parent = stack[stack.length - 1].obj;
 
     if (valueRaw === "") {
+      // Tentatively a nested map; a following "- " sequence converts it to an array.
       const child: Record<string, unknown> = {};
       parent[key] = child;
       stack.push({ indent, obj: child });
+      pending = { indent, key, obj: parent };
       continue;
     }
 
     parent[key] = parseScalar(valueRaw);
+    pending = null;
   }
 
   return root;
@@ -86,6 +114,9 @@ function parseScalar(value: string): unknown {
   if (value === "true") return true;
   if (value === "false") return false;
   if (/^-?\d+$/.test(value)) return Number(value);
+  if (value.startsWith("[") && value.endsWith("]")) {
+    return parseFlowArray(value);
+  }
   if (
     (value.startsWith('"') && value.endsWith('"')) ||
     (value.startsWith("'") && value.endsWith("'"))
@@ -93,6 +124,12 @@ function parseScalar(value: string): unknown {
     return value.slice(1, -1);
   }
   return value;
+}
+
+function parseFlowArray(value: string): unknown[] {
+  const inner = value.slice(1, -1).trim();
+  if (inner === "") return [];
+  return inner.split(",").map((item) => parseScalar(item.trim()));
 }
 
 export function loadConfig(startDir: string = process.cwd()): {
