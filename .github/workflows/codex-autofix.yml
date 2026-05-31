@@ -35,7 +35,7 @@ jobs:
         # persist-credentials (default true) so we can push the fix branch.
 
       - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: "22"
 
