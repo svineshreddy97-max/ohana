@@ -31,7 +31,7 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         # persist-credentials (default true) so we can push the fix branch.
 
       - uses: pnpm/action-setup@v4
