@@ -37,6 +37,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Fixed
 
+- Lint diagnostics are now sorted by line then column within each file, so
+  text and SARIF output are deterministic regardless of compiler emit order.
 - `ohana sim` no longer crashes on `.yaml`/`.yml` scenario files. Scenario
   discovery already matched them, but the loader only ran `JSON.parse`; YAML
   scenarios are now parsed with the config YAML subset.

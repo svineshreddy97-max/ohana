@@ -89,15 +89,23 @@ export async function discoverAgentFiles(
     .sort();
 }
 
+/**
+ * Stable ordering (line, then column) so text and SARIF output are
+ * deterministic regardless of the order the compiler emits diagnostics.
+ * Returns a new array; the input is not mutated.
+ */
+export function sortDiagnostics(diagnostics: LintDiagnostic[]): LintDiagnostic[] {
+  return [...diagnostics].sort((a, b) => a.line - b.line || a.column - b.column);
+}
+
 export async function lintFile(
   filePath: string,
   options: { agentScriptEntry?: string } = {},
 ): Promise<LintFileResult> {
   const compiled = await compileAgentFile(filePath, options);
-  const diagnostics: LintDiagnostic[] = compiled.diagnostics.map((d) => ({
-    ...d,
-    file: filePath,
-  }));
+  const diagnostics: LintDiagnostic[] = sortDiagnostics(
+    compiled.diagnostics.map((d) => ({ ...d, file: filePath })),
+  );
 
   const errorCount = diagnostics.filter((d) => d.severity === "error").length;
   const warningCount = diagnostics.filter((d) => d.severity === "warning").length;
