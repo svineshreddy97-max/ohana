@@ -8,6 +8,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- `ohana lint --format sarif` — emits a SARIF 2.1.0 log for GitHub code scanning, so
+  diagnostics surface as inline PR annotations.
 - Standalone build support: `pnpm ensure:agentscript` now clones and builds
   `salesforce/agentscript` into a repo-local `.agentscript/` cache when no
   sibling checkout or prebuilt entry is available. Pin with `OHANA_AGENTSCRIPT_REF`.

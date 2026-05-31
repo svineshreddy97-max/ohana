@@ -169,4 +169,5 @@ export function formatLintReportText(result: LintProjectResult): string {
   return lines.join("\n");
 }
 
+export { formatLintReportSarif, buildSarif } from "./sarif.js";
 export { resolveFromRoot, loadConfig, type DiagnosticSeverityName };

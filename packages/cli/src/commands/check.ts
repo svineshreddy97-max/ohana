@@ -3,7 +3,7 @@ import { simCommand, type SimCommandOptions } from "./sim.js";
 
 export interface CheckCommandOptions {
   path?: string;
-  format?: "text" | "json";
+  format?: "text" | "json" | "sarif";
   failOnWarning?: boolean;
   agentScriptEntry?: string;
   skipSim?: boolean;

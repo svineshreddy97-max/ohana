@@ -36,6 +36,21 @@ Parse, lint, and compile all `.agent` files under the project root (or `--path`)
 ohana lint --path force-app --format json --fail-on-warning
 ```
 
+Emit [SARIF](https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html) for
+GitHub code scanning, so diagnostics appear as inline PR annotations:
+
+```bash
+ohana lint --path force-app --format sarif > ohana.sarif
+```
+
+```yaml
+# In a workflow, after building ohana:
+- run: node packages/cli/dist/bin/ohana.js lint --path force-app --format sarif > ohana.sarif
+- uses: github/codeql-action/upload-sarif@v3
+  with:
+    sarif_file: ohana.sarif
+```
+
 ### `ohana sim`
 
 Run offline scenarios from `scenarios/*.json` with fixture mocks from `fixtures/`.

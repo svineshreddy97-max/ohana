@@ -1,4 +1,5 @@
 import {
+  formatLintReportSarif,
   formatLintReportText,
   lintProject,
   type LintProjectResult,
@@ -6,7 +7,7 @@ import {
 
 export interface LintCommandOptions {
   path?: string;
-  format?: "text" | "json";
+  format?: "text" | "json" | "sarif";
   failOnWarning?: boolean;
   agentScriptEntry?: string;
 }
@@ -18,13 +19,16 @@ export async function lintCommand(options: LintCommandOptions = {}): Promise<num
     agentScriptEntry: options.agentScriptEntry,
   });
 
-  if (options.format === "json") {
+  if (options.format === "sarif") {
+    console.log(formatLintReportSarif(result));
+  } else if (options.format === "json") {
     console.log(JSON.stringify(sanitizeForJson(result), null, 2));
   } else {
     console.log(formatLintReportText(result));
   }
 
   if (result.fileCount === 0) {
+    // Keep stdout valid for machine formats; report the hint on stderr only.
     console.error("\nNo .agent files found. Use --path to point at your DX project root.");
     return 2;
   }

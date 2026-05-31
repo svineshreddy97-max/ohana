@@ -12,7 +12,7 @@ Usage:
 
 Options (lint / check):
   --path <dir>             Project root (default: cwd or .ohana/config.yaml)
-  --format <text|json>     Output format (default: text)
+  --format <text|json|sarif>  Output format (default: text). sarif: GitHub code scanning (lint)
   --fail-on-warning        Exit non-zero on warnings
   --agentscript <path>     Path to @agentscript/agentforce dist/index.js
   --skip-sim               For check: run lint only
@@ -62,7 +62,12 @@ function parseArgs(argv: string[]) {
 function sharedOptions(options: Record<string, string | boolean>) {
   return {
     path: typeof options.path === "string" ? options.path : undefined,
-    format: options.format === "json" ? ("json" as const) : ("text" as const),
+    format:
+      options.format === "json"
+        ? ("json" as const)
+        : options.format === "sarif"
+          ? ("sarif" as const)
+          : ("text" as const),
     failOnWarning: options["fail-on-warning"] === true,
     agentScriptEntry:
       typeof options.agentscript === "string" ? options.agentscript : undefined,
