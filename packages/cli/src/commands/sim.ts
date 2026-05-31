@@ -1,6 +1,7 @@
 import path from "node:path";
 import { loadConfig, resolveFromRoot } from "@ohana/core";
 import { formatSimReportText, runScenarioProject } from "@ohana/sim";
+import { emitReport } from "./output.js";
 
 export interface SimCommandOptions {
   path?: string;
@@ -9,6 +10,7 @@ export interface SimCommandOptions {
   agentScriptEntry?: string;
   /** Case-insensitive substring; only scenarios whose id contains it run. */
   filter?: string;
+  out?: string;
 }
 
 export async function simCommand(options: SimCommandOptions = {}): Promise<number> {
@@ -24,11 +26,11 @@ export async function simCommand(options: SimCommandOptions = {}): Promise<numbe
     filter: options.filter,
   });
 
-  if (options.format === "json") {
-    console.log(JSON.stringify(result, null, 2));
-  } else {
-    console.log(formatSimReportText(result));
-  }
+  const output =
+    options.format === "json"
+      ? JSON.stringify(result, null, 2)
+      : formatSimReportText(result);
+  emitReport(output, options.out);
 
   if (result.scenarios.length === 0) {
     if (options.filter) {

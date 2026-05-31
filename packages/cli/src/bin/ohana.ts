@@ -18,6 +18,7 @@ Options (lint / check):
                            sarif: GitHub code scanning upload (lint).
                            github: inline PR annotations via workflow commands (lint).
   --fail-on-warning        Exit non-zero on warnings
+  --out <file>             Write the report to a file instead of stdout (lint/sim)
   --agentscript <path>     Path to @agentscript/agentforce dist/index.js
   --skip-sim               For check: run lint only
 
@@ -47,14 +48,17 @@ async function main() {
 
   const shared = sharedOptions(options);
 
+  const out = typeof options.out === "string" ? options.out : undefined;
+
   if (command === "lint") {
-    process.exit(await lintCommand(shared));
+    process.exit(await lintCommand({ ...shared, out }));
   }
 
   if (command === "sim") {
     process.exit(
       await simCommand({
         ...shared,
+        out,
         filter: typeof options.filter === "string" ? options.filter : undefined,
       }),
     );

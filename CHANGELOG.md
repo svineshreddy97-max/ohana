@@ -11,6 +11,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - CLI argument parsing extracted into `@ohana/cli/args` with unit-test coverage
   (`parseArgs`, `sharedOptions`, `getVersion`).
 - `ohana --version` / `ohana -v` prints the CLI version.
+- `--out <file>` for `lint` and `sim` writes the report to a file (creating
+  parent dirs) instead of stdout — e.g. `lint --format sarif --out ohana.sarif`.
 - `ohana sim` now fails with a clear error when two scenarios share an `id`,
   instead of silently double-counting them.
 - `ohana sim --filter <id>` runs only scenarios whose id contains the given
