@@ -11,7 +11,7 @@ import type { LintProjectResult } from "./index.js";
  */
 
 const TOOL_NAME = "ohana";
-const TOOL_VERSION = "0.2.0";
+const TOOL_VERSION = "0.3.0";
 const INFORMATION_URI = "https://github.com/svineshreddy97-max/ohana";
 const DEFAULT_RULE_ID = "ohana.compile";
 

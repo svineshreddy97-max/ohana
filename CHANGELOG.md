@@ -6,6 +6,8 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-05-31
+
 ### Added
 
 - CLI argument parsing extracted into `@ohana/cli/args` with unit-test coverage
@@ -28,7 +30,6 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - `lint.ignore` in `.ohana/config.yaml` — extra directory names to skip during
   `.agent` discovery, on top of the built-in defaults (`node_modules`, `.git`,
   `dist`, `.ohana`).
-
 - `ohana lint --format sarif` — emits a SARIF 2.1.0 log for GitHub code scanning, so
   diagnostics surface as inline PR annotations.
 - `ohana lint --format github` — emits GitHub Actions workflow-command
