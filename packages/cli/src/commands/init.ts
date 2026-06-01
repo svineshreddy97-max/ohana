@@ -10,6 +10,9 @@ lint:
   #   - "**/*.agent"
   # ignore:
   #   - vendor
+  # rules:
+  #   "ohana/naming-convention": warn
+  #   "ohana/no-unused-action": off
 
 sim:
   scenarios: scenarios

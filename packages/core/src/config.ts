@@ -9,6 +9,8 @@ export interface OhanaConfig {
     fail_on_warning?: boolean;
     /** Extra directory names to skip during discovery, on top of the defaults. */
     ignore?: string[];
+    /** Per-rule severity overrides for the Ohana semantic rules: off | warn | error (0 | 1 | 2). */
+    rules?: Record<string, string | number>;
   };
   sim?: {
     fixtures?: string;
@@ -92,7 +94,7 @@ export function parseSimpleYaml(text: string): Record<string, unknown> {
     const match = trimmed.match(/^([^:]+):\s*(.*)$/);
     if (!match) continue;
 
-    const key = match[1].trim();
+    const key = parseScalar(match[1].trim()) as string;
     const valueRaw = match[2].trim();
     const parent = stack[stack.length - 1].obj;
 

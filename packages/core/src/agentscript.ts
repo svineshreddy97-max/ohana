@@ -35,14 +35,44 @@ export interface AgentVersionIr {
   state_variables?: unknown[];
 }
 
+export interface AgentActionInputIr {
+  developer_name: string;
+  label?: string;
+  description?: string;
+  data_type?: string;
+  required?: boolean;
+  is_list?: boolean;
+}
+
+export interface AgentActionOutputIr {
+  developer_name: string;
+  label?: string;
+  description?: string;
+  data_type?: string;
+  is_list?: boolean;
+  is_displayable?: boolean;
+}
+
 export interface AgentActionIr {
   developer_name: string;
   label?: string;
   description?: string;
   invocation_target_type?: string;
   invocation_target_name?: string;
-  input_type?: Array<{ developer_name: string; required?: boolean }>;
-  output_type?: Array<{ developer_name: string }>;
+  input_type?: AgentActionInputIr[];
+  output_type?: AgentActionOutputIr[];
+}
+
+/** A tool wired into a subagent's reasoning — an action invocation or a routing transition. */
+export interface AgentToolIr {
+  name?: string;
+  target?: string;
+  type?: string;
+  description?: string;
+  /** State writes; routing transitions encode the next topic here. */
+  state_updates?: Array<Record<string, string>>;
+  llm_inputs?: string[];
+  bound_inputs?: Record<string, unknown>;
 }
 
 export interface AgentNodeIr {
@@ -50,8 +80,9 @@ export interface AgentNodeIr {
   label?: string;
   description?: string;
   type?: string;
+  reasoning_type?: string;
   action_definitions?: AgentActionIr[];
-  tools?: Array<{ name?: string; target?: string; type?: string }>;
+  tools?: AgentToolIr[];
   instructions?: string;
 }
 

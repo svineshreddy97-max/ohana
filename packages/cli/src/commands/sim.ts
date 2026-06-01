@@ -1,12 +1,12 @@
 import path from "node:path";
 import { loadConfig, resolveFromRoot } from "@ohana/core";
-import { formatSimReportText, runScenarioProject } from "@ohana/sim";
+import { formatSimReportJUnit, formatSimReportText, runScenarioProject } from "@ohana/sim";
 import { emitReport } from "./output.js";
 
 export interface SimCommandOptions {
   path?: string;
   // "sarif" and "github" are lint-only formats; sim renders them as text.
-  format?: "text" | "json" | "sarif" | "github";
+  format?: "text" | "json" | "sarif" | "github" | "junit";
   agentScriptEntry?: string;
   /** Case-insensitive substring; only scenarios whose id contains it run. */
   filter?: string;
@@ -30,7 +30,9 @@ export async function simCommand(options: SimCommandOptions = {}): Promise<numbe
   const output =
     options.format === "json"
       ? JSON.stringify(result, null, 2)
-      : formatSimReportText(result, { color: options.color });
+      : options.format === "junit"
+        ? formatSimReportJUnit(result)
+        : formatSimReportText(result, { color: options.color });
   emitReport(output, options.out);
 
   if (result.scenarios.length === 0) {

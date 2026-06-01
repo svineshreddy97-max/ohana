@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-export type OutputFormat = "text" | "json" | "sarif" | "github";
+export type OutputFormat = "text" | "json" | "sarif" | "github" | "junit";
 
 export interface ParsedArgs {
   command: string;
@@ -61,18 +61,19 @@ export interface SharedOptions {
 export function sharedOptions(options: Record<string, string | boolean>): SharedOptions {
   return {
     path: typeof options.path === "string" ? options.path : undefined,
-    format:
-      options.format === "json"
-        ? "json"
-        : options.format === "sarif"
-          ? "sarif"
-          : options.format === "github"
-            ? "github"
-            : "text",
+    format: normalizeFormat(options.format),
     failOnWarning: options["fail-on-warning"] === true,
     agentScriptEntry:
       typeof options.agentscript === "string" ? options.agentscript : undefined,
   };
+}
+
+const OUTPUT_FORMATS: OutputFormat[] = ["text", "json", "sarif", "github", "junit"];
+
+function normalizeFormat(value: string | boolean | undefined): OutputFormat {
+  return typeof value === "string" && (OUTPUT_FORMATS as string[]).includes(value)
+    ? (value as OutputFormat)
+    : "text";
 }
 
 /** Read the CLI package version from its package.json (works from src and dist). */

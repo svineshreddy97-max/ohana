@@ -3,11 +3,12 @@ import { simCommand, type SimCommandOptions } from "./sim.js";
 
 export interface CheckCommandOptions {
   path?: string;
-  format?: "text" | "json" | "sarif" | "github";
+  format?: "text" | "json" | "sarif" | "github" | "junit";
   failOnWarning?: boolean;
   agentScriptEntry?: string;
   skipSim?: boolean;
   color?: boolean;
+  disableRules?: boolean;
 }
 
 export async function checkCommand(options: CheckCommandOptions = {}): Promise<number> {
@@ -17,6 +18,7 @@ export async function checkCommand(options: CheckCommandOptions = {}): Promise<n
     failOnWarning: options.failOnWarning,
     agentScriptEntry: options.agentScriptEntry,
     color: options.color,
+    disableRules: options.disableRules,
   };
 
   const lintCode = await lintCommand(lintOpts);

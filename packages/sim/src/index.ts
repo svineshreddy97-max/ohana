@@ -330,6 +330,8 @@ export async function runScenarioProject(options: {
   };
 }
 
+export { formatSimReportJUnit } from "./junit.js";
+
 export function formatSimReportText(
   result: SimProjectResult,
   options: { color?: boolean } = {},

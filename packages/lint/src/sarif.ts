@@ -1,6 +1,9 @@
 import path from "node:path";
 import type { DiagnosticSeverityName } from "@ohana/core";
 import type { LintProjectResult } from "./index.js";
+import { OHANA_RULES } from "./rules.js";
+
+const RULE_DESCRIPTIONS = new Map(OHANA_RULES.map((r) => [r.id, r.description]));
 
 /**
  * Render a lint result as a SARIF 2.1.0 log. SARIF is the format GitHub code
@@ -11,9 +14,9 @@ import type { LintProjectResult } from "./index.js";
  */
 
 const TOOL_NAME = "ohana";
-const TOOL_VERSION = "0.3.0";
+const TOOL_VERSION = "0.4.0";
 const INFORMATION_URI = "https://github.com/svineshreddy97-max/ohana";
-const DEFAULT_RULE_ID = "ohana.compile";
+const DEFAULT_RULE_ID = "ohana/compile";
 
 // SARIF "level" is one of none | note | warning | error.
 type SarifLevel = "note" | "warning" | "error";
@@ -39,13 +42,37 @@ function toUri(root: string, file: string): string {
 }
 
 export function buildSarif(result: LintProjectResult): unknown {
+  // Build the rule catalog first so each result can carry a matching ruleIndex.
   const ruleIds = new Set<string>();
+  for (const file of result.files) {
+    for (const d of file.diagnostics) {
+      ruleIds.add(d.code ?? DEFAULT_RULE_ID);
+    }
+  }
+
+  const sortedIds = [...ruleIds].sort();
+  const ruleIndex = new Map(sortedIds.map((id, i) => [id, i]));
+
+  const rules = sortedIds.map((id) => ({
+    id,
+    name: id,
+    shortDescription: {
+      text:
+        RULE_DESCRIPTIONS.get(id) ??
+        (id === DEFAULT_RULE_ID
+          ? "Agent Script compile diagnostic"
+          : `Ohana lint rule ${id}`),
+    },
+    helpUri: INFORMATION_URI,
+  }));
+
   const sarifResults = result.files.flatMap((file) =>
     file.diagnostics.map((d) => {
       const ruleId = d.code ?? DEFAULT_RULE_ID;
-      ruleIds.add(ruleId);
       return {
         ruleId,
+        // SARIF: when both are present they must identify the same rule.
+        ruleIndex: ruleIndex.get(ruleId)!,
         level: toSarifLevel(d.severity),
         message: { text: d.message },
         locations: [
@@ -59,17 +86,6 @@ export function buildSarif(result: LintProjectResult): unknown {
       };
     }),
   );
-
-  const rules = [...ruleIds].sort().map((id) => ({
-    id,
-    name: id,
-    shortDescription: {
-      text:
-        id === DEFAULT_RULE_ID
-          ? "Agent Script compile diagnostic"
-          : `Ohana lint rule ${id}`,
-    },
-  }));
 
   return {
     version: "2.1.0",

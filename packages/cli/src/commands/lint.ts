@@ -1,5 +1,6 @@
 import {
   formatLintReportGithub,
+  formatLintReportJUnit,
   formatLintReportSarif,
   formatLintReportText,
   lintProject,
@@ -9,11 +10,13 @@ import { emitReport } from "./output.js";
 
 export interface LintCommandOptions {
   path?: string;
-  format?: "text" | "json" | "sarif" | "github";
+  format?: "text" | "json" | "sarif" | "github" | "junit";
   failOnWarning?: boolean;
   agentScriptEntry?: string;
   out?: string;
   color?: boolean;
+  /** Disable the Ohana semantic rules, leaving only compiler diagnostics. */
+  disableRules?: boolean;
 }
 
 export async function lintCommand(options: LintCommandOptions = {}): Promise<number> {
@@ -21,6 +24,7 @@ export async function lintCommand(options: LintCommandOptions = {}): Promise<num
     root: options.path,
     failOnWarning: options.failOnWarning,
     agentScriptEntry: options.agentScriptEntry,
+    disableRules: options.disableRules,
   });
 
   const output =
@@ -28,9 +32,11 @@ export async function lintCommand(options: LintCommandOptions = {}): Promise<num
       ? formatLintReportSarif(result)
       : options.format === "github"
         ? formatLintReportGithub(result)
-        : options.format === "json"
-          ? JSON.stringify(sanitizeForJson(result), null, 2)
-          : formatLintReportText(result, { color: options.color });
+        : options.format === "junit"
+          ? formatLintReportJUnit(result)
+          : options.format === "json"
+            ? JSON.stringify(sanitizeForJson(result), null, 2)
+            : formatLintReportText(result, { color: options.color });
   emitReport(output, options.out);
 
   if (result.fileCount === 0) {

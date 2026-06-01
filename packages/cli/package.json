@@ -1,6 +1,6 @@
 {
   "name": "@ohana/cli",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Ohana CLI — CI tooling for Salesforce Agent Script",
   "license": "Apache-2.0",
   "type": "module",

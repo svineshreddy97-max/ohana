@@ -17,10 +17,12 @@ Usage:
 
 Options (lint / check):
   --path <dir>             Project root (default: cwd or .ohana/config.yaml)
-  --format <text|json|sarif|github>  Output format (default: text).
+  --format <text|json|sarif|github|junit>  Output format (default: text).
                            sarif: GitHub code scanning upload (lint).
                            github: inline PR annotations via workflow commands (lint).
+                           junit: JUnit XML for CI test reporters (lint/sim).
   --fail-on-warning        Exit non-zero on warnings
+  --no-rules               Disable Ohana semantic lint rules (compiler only)
   --out <file>             Write the report to a file instead of stdout (lint/sim)
   --no-color               Disable ANSI color (also honors NO_COLOR)
   --agentscript <path>     Path to @agentscript/agentforce dist/index.js
@@ -67,8 +69,10 @@ async function main() {
       explicitNoColor: options["no-color"] === true,
     });
 
+  const disableRules = options["no-rules"] === true;
+
   if (command === "lint") {
-    process.exit(await lintCommand({ ...shared, out, color }));
+    process.exit(await lintCommand({ ...shared, out, color, disableRules }));
   }
 
   if (command === "sim") {
@@ -88,6 +92,7 @@ async function main() {
         ...shared,
         color,
         skipSim: options["skip-sim"] === true,
+        disableRules,
       }),
     );
   }

@@ -53,6 +53,19 @@ Actions workflow commands, so diagnostics appear directly on the PR:
 ohana lint --path force-app --format github
 ```
 
+**Ohana semantic rules.** On top of Agent Script compiler diagnostics, Ohana runs
+graph-level checks (missing descriptions, dangling transitions, unreachable
+subagents, unused actions, and more). Configure per-rule severity in
+`.ohana/config.yaml` or pass `--no-rules` to skip them:
+
+```bash
+ohana lint --path force-app --no-rules          # compiler only
+ohana lint --path force-app --fail-on-warning   # warnings fail CI too
+```
+
+Rule ids follow the `ohana/<name>` convention (e.g. `ohana/no-missing-description`).
+See `lint.rules` in the configuration section below.
+
 **SARIF for code scanning.** Emit [SARIF 2.1.0](https://docs.oasis-open.org/sarif/sarif/v2.1.0/sarif-v2.1.0.html)
 and upload it:
 
@@ -62,6 +75,15 @@ and upload it:
 - uses: github/codeql-action/upload-sarif@v3
   with:
     sarif_file: ohana.sarif
+```
+
+**JUnit XML for CI test reporters.** `--format junit` on `lint` or `sim` emits
+JUnit XML that tools like [dorny/test-reporter](https://github.com/dorny/test-reporter)
+consume — one testcase per `.agent` file or scenario:
+
+```bash
+ohana lint --path force-app --format junit --out ohana-lint.xml
+ohana sim --path . --format junit --out ohana-sim.xml
 ```
 
 ### `ohana sim`
@@ -103,8 +125,9 @@ Runs `lint` then `sim` — recommended CI entry point.
 | Flag | Commands | Description |
 |------|----------|-------------|
 | `--path <dir>` | all | Project root (default: cwd or nearest `.ohana/config.yaml`) |
-| `--format <text\|json\|sarif\|github>` | lint, check | Output format (default `text`). `sarif`/`github` are lint-only |
+| `--format <text\|json\|sarif\|github\|junit>` | lint, sim, check | Output format (default `text`). `sarif`/`github` are lint-only |
 | `--fail-on-warning` | lint, check | Exit non-zero on warnings |
+| `--no-rules` | lint, check | Disable Ohana semantic lint rules (compiler diagnostics only) |
 | `--filter <id>` | sim | Run only scenarios whose id contains this substring |
 | `--out <file>` | lint, sim | Write the report to a file (creating parent dirs) instead of stdout |
 | `--no-color` | all | Disable ANSI color (also honors `NO_COLOR`) |
@@ -128,6 +151,9 @@ lint:
     - "**/aiAuthoringBundles/**/*.agent"
   ignore:          # extra dirs to skip (on top of node_modules/.git/dist/.ohana)
     - vendor
+  rules:           # per-rule severity: off | warn | error (0 | 1 | 2)
+    "ohana/naming-convention": warn
+    "ohana/no-unused-action": off
 sim:
   fixtures: fixtures
   scenarios: scenarios
@@ -173,8 +199,9 @@ $env:OHANA_AGENTSCRIPT_ENTRY = "C:\path\to\agentscript\packages\agentforce\dist\
 - [x] v0.2 — `ohana sim`, `ohana check`, `.ohana/config.yaml`
 - [x] v0.3 — `ohana init`, SARIF + GitHub annotations, `--filter`/`--out`,
   colorized output, YAML scenarios, config list options
+- [x] v0.4 — Ohana semantic lint rules, `--format junit`, `--no-rules`,
+  `lint.rules` config
 - [ ] npm publish when `@agentscript/agentforce` is public
-- [ ] ohana-specific lint rules (naming, required descriptions, unused tools)
 - [ ] `.as-trace` export
 
 ## Related

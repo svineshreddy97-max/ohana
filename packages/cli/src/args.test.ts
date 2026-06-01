@@ -51,9 +51,11 @@ describe("sharedOptions", () => {
     expect(sharedOptions({}).format).toBe("text");
   });
 
-  it("recognizes json and sarif formats", () => {
+  it("recognizes json, sarif, github, and junit formats", () => {
     expect(sharedOptions({ format: "json" }).format).toBe("json");
     expect(sharedOptions({ format: "sarif" }).format).toBe("sarif");
+    expect(sharedOptions({ format: "github" }).format).toBe("github");
+    expect(sharedOptions({ format: "junit" }).format).toBe("junit");
   });
 
   it("falls back to text for an unknown format", () => {

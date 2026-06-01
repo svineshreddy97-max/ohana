@@ -8,6 +8,7 @@ import {
   type AgentDiagnostic,
   type DiagnosticSeverityName,
 } from "@ohana/core";
+import { runOhanaRules, type RuleSeverityConfig } from "./rules.js";
 
 export const DEFAULT_AGENT_GLOBS = [
   "**/*.agent",
@@ -41,6 +42,16 @@ export interface LintProjectOptions {
   globs?: string[];
   failOnWarning?: boolean;
   agentScriptEntry?: string;
+  /** Per-rule severity overrides for the Ohana semantic rules. */
+  rules?: RuleSeverityConfig;
+  /** Disable the Ohana semantic rules, leaving only compiler diagnostics. */
+  disableRules?: boolean;
+}
+
+export interface LintFileOptions {
+  agentScriptEntry?: string;
+  rules?: RuleSeverityConfig;
+  disableRules?: boolean;
 }
 
 function globToRegExp(globPattern: string): RegExp {
@@ -104,11 +115,20 @@ export function sortDiagnostics(diagnostics: LintDiagnostic[]): LintDiagnostic[]
 
 export async function lintFile(
   filePath: string,
-  options: { agentScriptEntry?: string } = {},
+  options: LintFileOptions = {},
 ): Promise<LintFileResult> {
-  const compiled = await compileAgentFile(filePath, options);
+  const compiled = await compileAgentFile(filePath, {
+    agentScriptEntry: options.agentScriptEntry,
+  });
+
+  const raw: AgentDiagnostic[] = [...compiled.diagnostics];
+  // Semantic rules need a valid IR; only run them when the compiler succeeded.
+  if (!options.disableRules && compiled.output != null && !compiled.hasErrors) {
+    raw.push(...runOhanaRules(compiled.output, compiled.source, options.rules));
+  }
+
   const diagnostics: LintDiagnostic[] = sortDiagnostics(
-    compiled.diagnostics.map((d) => ({ ...d, file: filePath })),
+    raw.map((d) => ({ ...d, file: filePath })),
   );
 
   const errorCount = diagnostics.filter((d) => d.severity === "error").length;
@@ -132,12 +152,19 @@ export async function lintProject(options: LintProjectOptions = {}): Promise<Lin
   const globs = Array.isArray(globsRaw) ? globsRaw : DEFAULT_AGENT_GLOBS;
   const failOnWarning = options.failOnWarning ?? config.lint?.fail_on_warning ?? false;
   const extraIgnore = Array.isArray(config.lint?.ignore) ? config.lint!.ignore : [];
+  const rules = options.rules ?? config.lint?.rules;
 
   const files = await discoverAgentFiles(root, globs, extraIgnore);
   const results: LintFileResult[] = [];
 
   for (const file of files) {
-    results.push(await lintFile(file, { agentScriptEntry: options.agentScriptEntry }));
+    results.push(
+      await lintFile(file, {
+        agentScriptEntry: options.agentScriptEntry,
+        rules,
+        disableRules: options.disableRules,
+      }),
+    );
   }
 
   const errorCount = results.reduce((n, r) => n + r.errorCount, 0);
@@ -186,4 +213,13 @@ export function formatLintReportText(
 
 export { formatLintReportSarif, buildSarif } from "./sarif.js";
 export { formatLintReportGithub } from "./github.js";
+export { formatLintReportJUnit } from "./junit.js";
+export {
+  OHANA_RULES,
+  resolveRuleSeverity,
+  runOhanaRules,
+  type RuleMeta,
+  type RuleSeverity,
+  type RuleSeverityConfig,
+} from "./rules.js";
 export { resolveFromRoot, loadConfig, type DiagnosticSeverityName };

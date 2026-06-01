@@ -38,6 +38,17 @@ sim:
     ]);
   });
 
+  it("parses lint.rules severity overrides", () => {
+    const parsed = parseSimpleYaml(`lint:
+  rules:
+    "ohana/naming-convention": warn
+    "ohana/no-unused-action": off
+`);
+    const rules = (parsed.lint as Record<string, unknown>).rules as Record<string, string>;
+    expect(rules["ohana/naming-convention"]).toBe("warn");
+    expect(rules["ohana/no-unused-action"]).toBe("off");
+  });
+
   it("parses an empty flow array", () => {
     const parsed = parseSimpleYaml(`lint:\n  globs: []\n`);
     expect((parsed.lint as Record<string, unknown>).globs).toEqual([]);

@@ -6,6 +6,31 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-06-01
+
+### Added
+
+- Ohana semantic lint rules on top of Agent Script compiler diagnostics:
+  `ohana/no-missing-description`, `ohana/naming-convention` (off by default),
+  `ohana/dangling-transition`, `ohana/unreachable-subagent`,
+  `ohana/missing-action-target`, `ohana/no-unused-action`, and
+  `ohana/duplicate-developer-name`. Rules run only when compilation succeeds;
+  disable them with `--no-rules` or per-rule via `lint.rules` in
+  `.ohana/config.yaml`.
+- `--format junit` for `lint` and `sim` — emits JUnit XML (one testcase per
+  `.agent` file or scenario) for CI test reporters such as dorny/test-reporter.
+- `--no-rules` on `lint` and `check` — compiler diagnostics only.
+- `lint.rules` in `.ohana/config.yaml` — per-rule severity overrides
+  (`off` / `warn` / `error`, or `0` / `1` / `2`).
+
+### Changed
+
+- SARIF rule ids now use the `ohana/<name>` convention (was `ohana.name`);
+  each result carries a `ruleIndex`, and built-in rule descriptions are
+  included in the SARIF rule catalog.
+- Expanded Agent IR types in `@ohana/core` for semantic rules (action inputs,
+  tools with state updates, routing transitions).
+
 ## [0.3.0] - 2026-05-31
 
 ### Added

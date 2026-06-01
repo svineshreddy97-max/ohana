@@ -28,7 +28,7 @@ function makeResult(overrides: Partial<LintProjectResult> = {}): LintProjectResu
           },
           {
             severity: "warning",
-            code: "ohana.placeholder",
+            code: "ohana/placeholder",
             message: "Placeholder value not replaced",
             line: 4,
             column: 9,
@@ -57,7 +57,7 @@ describe("buildSarif", () => {
 
     const [err, warn] = results;
     expect(err.level).toBe("error");
-    expect(err.ruleId).toBe("ohana.compile"); // no code -> default rule
+    expect(err.ruleId).toBe("ohana/compile"); // no code -> default rule
     expect(err.locations[0].physicalLocation.artifactLocation.uri).toBe(
       "agents/Local_Info_Agent.agent",
     );
@@ -67,13 +67,22 @@ describe("buildSarif", () => {
     });
 
     expect(warn.level).toBe("warning");
-    expect(warn.ruleId).toBe("ohana.placeholder");
+    expect(warn.ruleId).toBe("ohana/placeholder");
   });
 
   it("declares each distinct ruleId once in tool.driver.rules", () => {
     const sarif = buildSarif(makeResult()) as any;
     const ruleIds = sarif.runs[0].tool.driver.rules.map((r: any) => r.id);
-    expect(ruleIds).toEqual(["ohana.compile", "ohana.placeholder"]);
+    expect(ruleIds).toEqual(["ohana/compile", "ohana/placeholder"]);
+  });
+
+  it("emits a ruleIndex on each result that points at the matching rule", () => {
+    const sarif = buildSarif(makeResult()) as any;
+    const rules = sarif.runs[0].tool.driver.rules;
+    for (const r of sarif.runs[0].results) {
+      expect(typeof r.ruleIndex).toBe("number");
+      expect(rules[r.ruleIndex].id).toBe(r.ruleId);
+    }
   });
 
   it("emits an empty results array for a clean project", () => {
