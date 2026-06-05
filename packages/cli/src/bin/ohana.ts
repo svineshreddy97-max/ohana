@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import path from "node:path";
 import { checkCommand } from "../commands/check.js";
 import { lintCommand } from "../commands/lint.js";
 import { simCommand } from "../commands/sim.js";
@@ -6,6 +7,7 @@ import { initCommand } from "../commands/init.js";
 import { rulesCommand } from "../commands/rules.js";
 import { getVersion, parseArgs, sharedOptions } from "../args.js";
 import { shouldColorize } from "@ohana/core";
+import { watchDir } from "../watch.js";
 
 const HELP = `ohana — CI tooling for Salesforce Agent Script / Agentforce DX
 
@@ -27,6 +29,7 @@ Options (lint / check):
   --no-rules               Disable Ohana semantic lint rules (compiler only)
   --out <file>             Write the report to a file instead of stdout (lint/sim)
   --quiet                  Only show failures in text output
+  --watch                  Re-run on file changes (.agent, .json, .yaml)
   --no-color               Disable ANSI color (also honors NO_COLOR)
   --agentscript <path>     Path to @agentscript/agentforce dist/index.js
   --skip-sim               For check: run lint only
@@ -40,6 +43,7 @@ Examples:
   ohana sim --path examples/testdrive-ci
   ohana check --path examples/testdrive-ci
   ohana lint --format json --fail-on-warning
+  ohana check --watch --path examples/testdrive-ci
 `;
 
 async function main() {
@@ -79,7 +83,6 @@ async function main() {
   }
 
   const out = typeof options.out === "string" ? options.out : undefined;
-  // Color only makes sense for text written to a TTY (not files or machine formats).
   const color =
     shared.format === "text" &&
     !out &&
@@ -90,38 +93,66 @@ async function main() {
     });
 
   const disableRules = options["no-rules"] === true;
+  const watch = options.watch === true;
+  const watchable = ["lint", "sim", "check"];
 
-  if (command === "lint") {
-    process.exit(await lintCommand({ ...shared, out, color, quiet: shared.quiet, disableRules }));
-  }
-
-  if (command === "sim") {
-    process.exit(
-      await simCommand({
+  async function run(): Promise<number> {
+    if (command === "lint") {
+      return lintCommand({ ...shared, out, color, quiet: shared.quiet, disableRules });
+    }
+    if (command === "sim") {
+      return simCommand({
         ...shared,
         out,
         color,
         quiet: shared.quiet,
         filter: typeof options.filter === "string" ? options.filter : undefined,
-      }),
-    );
-  }
-
-  if (command === "check") {
-    process.exit(
-      await checkCommand({
+      });
+    }
+    if (command === "check") {
+      return checkCommand({
         ...shared,
         color,
         quiet: shared.quiet,
         skipSim: options["skip-sim"] === true,
         disableRules,
-      }),
-    );
+      });
+    }
+    return -1;
   }
 
-  console.error(`Unknown command: ${command}\n`);
-  console.error(HELP);
-  process.exit(1);
+  if (!watchable.includes(command!)) {
+    console.error(`Unknown command: ${command}\n`);
+    console.error(HELP);
+    process.exit(1);
+  }
+
+  const code = await run();
+
+  if (!watch) {
+    process.exit(code);
+  }
+
+  const watchPath = path.resolve(shared.path ?? process.cwd());
+  console.log(`\nWatching ${watchPath} for changes... (Ctrl+C to stop)\n`);
+
+  let running = false;
+  watchDir({
+    dir: watchPath,
+    onChange: async () => {
+      if (running) return;
+      running = true;
+      try {
+        console.log("\x1Bc");
+        await run();
+        console.log(`\nWatching ${watchPath} for changes... (Ctrl+C to stop)\n`);
+      } catch (err) {
+        console.error(err instanceof Error ? err.message : err);
+      } finally {
+        running = false;
+      }
+    },
+  });
 }
 
 main().catch((err) => {
