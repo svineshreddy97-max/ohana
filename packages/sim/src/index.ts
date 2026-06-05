@@ -338,8 +338,11 @@ export function formatSimReportText(
 ): string {
   const c = makeColorizer(options.color ?? false);
   const lines: string[] = [];
+  const passed = result.scenarios.filter((s) => s.ok).length;
+  const failed = result.scenarios.length - passed;
   lines.push(`Ohana sim — ${result.scenarios.length} scenario(s) under ${result.root}`);
-  lines.push(result.ok ? c.green("OK") : c.red("FAILED"));
+  const summary = `(${passed} passed, ${failed} failed)`;
+  lines.push(result.ok ? c.green(`OK ${summary}`) : c.red(`FAILED ${summary}`));
 
   for (const scenario of result.scenarios) {
     lines.push(`  ${scenario.ok ? c.green("✓") : c.red("✗")} ${scenario.id}`);
