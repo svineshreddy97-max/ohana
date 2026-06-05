@@ -223,6 +223,7 @@ export { formatLintReportGithub } from "./github.js";
 export { formatLintReportJUnit } from "./junit.js";
 export {
   OHANA_RULES,
+  normalizeSeverity,
   resolveRuleSeverity,
   runOhanaRules,
   type RuleMeta,
