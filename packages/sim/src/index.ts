@@ -331,6 +331,7 @@ export async function runScenarioProject(options: {
 }
 
 export { formatSimReportJUnit } from "./junit.js";
+export { computeCoverage, formatCoverageText, type CoverageProjectResult, type CoverageResult, type ActionCoverage } from "./coverage.js";
 
 function formatElapsed(ms: number): string {
   return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(1)}s`;

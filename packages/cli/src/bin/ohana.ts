@@ -5,6 +5,7 @@ import { lintCommand } from "../commands/lint.js";
 import { simCommand } from "../commands/sim.js";
 import { initCommand } from "../commands/init.js";
 import { rulesCommand } from "../commands/rules.js";
+import { coverageCommand } from "../commands/coverage.js";
 import { getVersion, parseArgs, sharedOptions } from "../args.js";
 import { shouldColorize } from "@ohana/core";
 import { watchDir } from "../watch.js";
@@ -17,6 +18,7 @@ Usage:
   ohana sim [options]      Run offline scenario simulations
   ohana check [options]    lint + sim (default CI entry)
   ohana rules [options]    List available lint rules
+  ohana coverage [options] Show action coverage from scenarios
   ohana --version          Print the ohana version
 
 Options (lint / check):
@@ -78,6 +80,24 @@ async function main() {
         path: shared.path,
         format: shared.format === "json" ? "json" : "text",
         color: rulesColor,
+      }),
+    );
+  }
+
+  if (command === "coverage") {
+    const covColor =
+      shared.format === "text" &&
+      shouldColorize({
+        isTty: process.stdout.isTTY,
+        noColorEnv: process.env.NO_COLOR,
+        explicitNoColor: options["no-color"] === true,
+      });
+    process.exit(
+      await coverageCommand({
+        path: shared.path,
+        format: shared.format === "json" ? "json" : "text",
+        agentScriptEntry: shared.agentScriptEntry,
+        color: covColor,
       }),
     );
   }
