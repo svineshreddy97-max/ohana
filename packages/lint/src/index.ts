@@ -186,13 +186,14 @@ export async function lintProject(options: LintProjectOptions = {}): Promise<Lin
 
 export function formatLintReportText(
   result: LintProjectResult,
-  options: { color?: boolean; quiet?: boolean } = {},
+  options: { color?: boolean; quiet?: boolean; elapsedMs?: number } = {},
 ): string {
   const c = makeColorizer(options.color ?? false);
   const lines: string[] = [];
+  const timing = options.elapsedMs !== undefined ? ` ${c.dim(`in ${formatElapsed(options.elapsedMs)}`)}` : "";
   lines.push(`Ohana lint — ${result.fileCount} file(s) under ${result.root}`);
   const summary = `(${result.errorCount} errors, ${result.warningCount} warnings)`;
-  lines.push(result.ok ? c.green(`OK ${summary}`) : c.red(`FAILED ${summary}`));
+  lines.push((result.ok ? c.green(`OK ${summary}`) : c.red(`FAILED ${summary}`)) + timing);
 
   for (const file of result.files) {
     if (file.diagnostics.length === 0) {
@@ -211,6 +212,10 @@ export function formatLintReportText(
   }
 
   return lines.join("\n");
+}
+
+function formatElapsed(ms: number): string {
+  return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(1)}s`;
 }
 
 export { formatLintReportSarif, buildSarif } from "./sarif.js";

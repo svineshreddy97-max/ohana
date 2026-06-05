@@ -21,12 +21,14 @@ export interface LintCommandOptions {
 }
 
 export async function lintCommand(options: LintCommandOptions = {}): Promise<number> {
+  const t0 = performance.now();
   const result = await lintProject({
     root: options.path,
     failOnWarning: options.failOnWarning,
     agentScriptEntry: options.agentScriptEntry,
     disableRules: options.disableRules,
   });
+  const elapsedMs = Math.round(performance.now() - t0);
 
   const output =
     options.format === "sarif"
@@ -37,7 +39,7 @@ export async function lintCommand(options: LintCommandOptions = {}): Promise<num
           ? formatLintReportJUnit(result)
           : options.format === "json"
             ? JSON.stringify(sanitizeForJson(result), null, 2)
-            : formatLintReportText(result, { color: options.color, quiet: options.quiet });
+            : formatLintReportText(result, { color: options.color, quiet: options.quiet, elapsedMs });
   emitReport(output, options.out);
 
   if (result.fileCount === 0) {

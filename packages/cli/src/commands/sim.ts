@@ -21,19 +21,21 @@ export async function simCommand(options: SimCommandOptions = {}): Promise<numbe
   const projectRoot = path.resolve(cwd);
   const scenariosDir = resolveFromRoot(projectRoot, config.sim?.scenarios ?? "scenarios");
 
+  const t0 = performance.now();
   const result = await runScenarioProject({
     scenariosDir,
     projectRoot,
     agentScriptEntry: options.agentScriptEntry,
     filter: options.filter,
   });
+  const elapsedMs = Math.round(performance.now() - t0);
 
   const output =
     options.format === "json"
       ? JSON.stringify(result, null, 2)
       : options.format === "junit"
         ? formatSimReportJUnit(result)
-        : formatSimReportText(result, { color: options.color, quiet: options.quiet });
+        : formatSimReportText(result, { color: options.color, quiet: options.quiet, elapsedMs });
   emitReport(output, options.out);
 
   if (result.scenarios.length === 0) {

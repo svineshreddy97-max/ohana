@@ -332,17 +332,22 @@ export async function runScenarioProject(options: {
 
 export { formatSimReportJUnit } from "./junit.js";
 
+function formatElapsed(ms: number): string {
+  return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(1)}s`;
+}
+
 export function formatSimReportText(
   result: SimProjectResult,
-  options: { color?: boolean; quiet?: boolean } = {},
+  options: { color?: boolean; quiet?: boolean; elapsedMs?: number } = {},
 ): string {
   const c = makeColorizer(options.color ?? false);
   const lines: string[] = [];
   const passed = result.scenarios.filter((s) => s.ok).length;
   const failed = result.scenarios.length - passed;
+  const timing = options.elapsedMs !== undefined ? ` ${c.dim(`in ${formatElapsed(options.elapsedMs)}`)}` : "";
   lines.push(`Ohana sim — ${result.scenarios.length} scenario(s) under ${result.root}`);
   const summary = `(${passed} passed, ${failed} failed)`;
-  lines.push(result.ok ? c.green(`OK ${summary}`) : c.red(`FAILED ${summary}`));
+  lines.push((result.ok ? c.green(`OK ${summary}`) : c.red(`FAILED ${summary}`)) + timing);
 
   for (const scenario of result.scenarios) {
     if (options.quiet && scenario.ok) continue;
