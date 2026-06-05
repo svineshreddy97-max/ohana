@@ -56,6 +56,7 @@ export interface SharedOptions {
   format: OutputFormat;
   failOnWarning: boolean;
   agentScriptEntry?: string;
+  quiet: boolean;
 }
 
 export function sharedOptions(options: Record<string, string | boolean>): SharedOptions {
@@ -65,6 +66,7 @@ export function sharedOptions(options: Record<string, string | boolean>): Shared
     failOnWarning: options["fail-on-warning"] === true,
     agentScriptEntry:
       typeof options.agentscript === "string" ? options.agentscript : undefined,
+    quiet: options.quiet === true,
   };
 }
 

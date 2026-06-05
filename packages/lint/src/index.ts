@@ -186,7 +186,7 @@ export async function lintProject(options: LintProjectOptions = {}): Promise<Lin
 
 export function formatLintReportText(
   result: LintProjectResult,
-  options: { color?: boolean } = {},
+  options: { color?: boolean; quiet?: boolean } = {},
 ): string {
   const c = makeColorizer(options.color ?? false);
   const lines: string[] = [];
@@ -196,7 +196,9 @@ export function formatLintReportText(
 
   for (const file of result.files) {
     if (file.diagnostics.length === 0) {
-      lines.push(`  ${c.green("✓")} ${file.file}`);
+      if (!options.quiet) {
+        lines.push(`  ${c.green("✓")} ${file.file}`);
+      }
       continue;
     }
     lines.push(`  ${c.red("✗")} ${file.file}`);

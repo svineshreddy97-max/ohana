@@ -26,6 +26,7 @@ Options (lint / check):
   --fail-on-warning        Exit non-zero on warnings
   --no-rules               Disable Ohana semantic lint rules (compiler only)
   --out <file>             Write the report to a file instead of stdout (lint/sim)
+  --quiet                  Only show failures in text output
   --no-color               Disable ANSI color (also honors NO_COLOR)
   --agentscript <path>     Path to @agentscript/agentforce dist/index.js
   --skip-sim               For check: run lint only
@@ -91,7 +92,7 @@ async function main() {
   const disableRules = options["no-rules"] === true;
 
   if (command === "lint") {
-    process.exit(await lintCommand({ ...shared, out, color, disableRules }));
+    process.exit(await lintCommand({ ...shared, out, color, quiet: shared.quiet, disableRules }));
   }
 
   if (command === "sim") {
@@ -100,6 +101,7 @@ async function main() {
         ...shared,
         out,
         color,
+        quiet: shared.quiet,
         filter: typeof options.filter === "string" ? options.filter : undefined,
       }),
     );
@@ -110,6 +112,7 @@ async function main() {
       await checkCommand({
         ...shared,
         color,
+        quiet: shared.quiet,
         skipSim: options["skip-sim"] === true,
         disableRules,
       }),

@@ -12,6 +12,7 @@ export interface SimCommandOptions {
   filter?: string;
   out?: string;
   color?: boolean;
+  quiet?: boolean;
 }
 
 export async function simCommand(options: SimCommandOptions = {}): Promise<number> {
@@ -32,7 +33,7 @@ export async function simCommand(options: SimCommandOptions = {}): Promise<numbe
       ? JSON.stringify(result, null, 2)
       : options.format === "junit"
         ? formatSimReportJUnit(result)
-        : formatSimReportText(result, { color: options.color });
+        : formatSimReportText(result, { color: options.color, quiet: options.quiet });
   emitReport(output, options.out);
 
   if (result.scenarios.length === 0) {

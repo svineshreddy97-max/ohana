@@ -78,6 +78,14 @@ describe("sharedOptions", () => {
     expect(shared.path).toBeUndefined();
     expect(shared.agentScriptEntry).toBeUndefined();
   });
+
+  it("maps --quiet to quiet: true", () => {
+    expect(sharedOptions({ quiet: true }).quiet).toBe(true);
+  });
+
+  it("defaults quiet to false", () => {
+    expect(sharedOptions({}).quiet).toBe(false);
+  });
 });
 
 describe("getVersion", () => {

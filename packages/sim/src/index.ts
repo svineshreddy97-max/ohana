@@ -334,7 +334,7 @@ export { formatSimReportJUnit } from "./junit.js";
 
 export function formatSimReportText(
   result: SimProjectResult,
-  options: { color?: boolean } = {},
+  options: { color?: boolean; quiet?: boolean } = {},
 ): string {
   const c = makeColorizer(options.color ?? false);
   const lines: string[] = [];
@@ -345,6 +345,7 @@ export function formatSimReportText(
   lines.push(result.ok ? c.green(`OK ${summary}`) : c.red(`FAILED ${summary}`));
 
   for (const scenario of result.scenarios) {
+    if (options.quiet && scenario.ok) continue;
     lines.push(`  ${scenario.ok ? c.green("✓") : c.red("✗")} ${scenario.id}`);
     lines.push(`    utterance: ${scenario.utterance}`);
     lines.push(

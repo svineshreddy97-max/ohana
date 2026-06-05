@@ -15,6 +15,7 @@ export interface LintCommandOptions {
   agentScriptEntry?: string;
   out?: string;
   color?: boolean;
+  quiet?: boolean;
   /** Disable the Ohana semantic rules, leaving only compiler diagnostics. */
   disableRules?: boolean;
 }
@@ -36,7 +37,7 @@ export async function lintCommand(options: LintCommandOptions = {}): Promise<num
           ? formatLintReportJUnit(result)
           : options.format === "json"
             ? JSON.stringify(sanitizeForJson(result), null, 2)
-            : formatLintReportText(result, { color: options.color });
+            : formatLintReportText(result, { color: options.color, quiet: options.quiet });
   emitReport(output, options.out);
 
   if (result.fileCount === 0) {

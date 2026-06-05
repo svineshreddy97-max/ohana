@@ -8,6 +8,7 @@ export interface CheckCommandOptions {
   agentScriptEntry?: string;
   skipSim?: boolean;
   color?: boolean;
+  quiet?: boolean;
   disableRules?: boolean;
 }
 
@@ -18,6 +19,7 @@ export async function checkCommand(options: CheckCommandOptions = {}): Promise<n
     failOnWarning: options.failOnWarning,
     agentScriptEntry: options.agentScriptEntry,
     color: options.color,
+    quiet: options.quiet,
     disableRules: options.disableRules,
   };
 
@@ -36,6 +38,7 @@ export async function checkCommand(options: CheckCommandOptions = {}): Promise<n
     format: options.format,
     agentScriptEntry: options.agentScriptEntry,
     color: options.color,
+    quiet: options.quiet,
   });
 }
 
