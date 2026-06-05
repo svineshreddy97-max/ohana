@@ -10,10 +10,13 @@
 Ohana lints and simulates `.agent` files locally and in GitHub Actions — no org required for the first checks.
 
 ```bash
-ohana init     # scaffold a project
+ohana init       # scaffold a project
 ohana lint
 ohana sim
-ohana check    # lint + sim
+ohana check      # lint + sim
+ohana rules      # list available lint rules
+ohana coverage   # show scenario coverage
+ohana validate   # check config for errors
 ```
 
 ## Quick start
@@ -120,6 +123,39 @@ mock.
 
 Runs `lint` then `sim` — recommended CI entry point.
 
+### `ohana rules`
+
+List all available Ohana semantic lint rules with their id, effective
+severity, and description. Respects `lint.rules` overrides from
+`.ohana/config.yaml`.
+
+```bash
+ohana rules --path .            # text output
+ohana rules --format json       # machine-readable list
+```
+
+### `ohana coverage`
+
+Show which agent actions have scenario test coverage and which are
+untested. Compiles `.agent` files and cross-references them against
+scenario definitions.
+
+```bash
+ohana coverage --path examples/testdrive-ci
+ohana coverage --format json    # machine-readable coverage data
+```
+
+### `ohana validate`
+
+Check `.ohana/config.yaml` for errors: unknown keys, invalid types,
+bad rule severities, and missing referenced paths. On success, prints the
+resolved config.
+
+```bash
+ohana validate --path .
+ohana validate --format json
+```
+
 ## Options
 
 | Flag | Commands | Description |
@@ -130,6 +166,8 @@ Runs `lint` then `sim` — recommended CI entry point.
 | `--no-rules` | lint, check | Disable Ohana semantic lint rules (compiler diagnostics only) |
 | `--filter <id>` | sim | Run only scenarios whose id contains this substring |
 | `--out <file>` | lint, sim | Write the report to a file (creating parent dirs) instead of stdout |
+| `--quiet` | lint, sim, check | Only show failures in text output |
+| `--watch` | lint, sim, check | Re-run on file changes (`.agent`, `.json`, `.yaml`) |
 | `--no-color` | all | Disable ANSI color (also honors `NO_COLOR`) |
 | `--agentscript <path>` | all | Path to `@agentscript/agentforce` `dist/index.js` |
 | `--skip-sim` | check | Run lint only |
@@ -201,6 +239,8 @@ $env:OHANA_AGENTSCRIPT_ENTRY = "C:\path\to\agentscript\packages\agentforce\dist\
   colorized output, YAML scenarios, config list options
 - [x] v0.4 — Ohana semantic lint rules, `--format junit`, `--no-rules`,
   `lint.rules` config
+- [x] v0.5 — `ohana rules`, `ohana coverage`, `ohana validate`,
+  `--quiet`, `--watch`, elapsed timing, sim summary stats
 - [ ] npm publish when `@agentscript/agentforce` is public
 - [ ] `.as-trace` export
 
